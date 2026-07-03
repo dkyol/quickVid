@@ -1,0 +1,50 @@
+# ── Secrets / security — never commit ─────────────────────────
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+*.p12
+*.pfx
+*_secret*
+*secrets*
+credentials*.json
+
+# ── Python cache ──────────────────────────────────────────────
+__pycache__/
+*.pyc
+
+# ── Media folder — nothing in here is pushed ──────────────────
+# (photos, videos, downloads — everything except the placeholder)
+media/*
+!media/.gitkeep
+!media/PUT_YOUR_PHOTOS_AND_VIDEOS_HERE.txt
+
+# ── Photos / images (anywhere in the repo) ────────────────────
+*.jpg
+*.jpeg
+*.png
+*.webp
+*.gif
+*.heic
+
+# ── Videos / audio (anywhere in the repo) ─────────────────────
+*.mov
+*.mp4
+*.m4v
+*.webm
+*.mp3
+*.wav
+*.m4a
+
+# ── Generated voiceover ───────────────────────────────────────
+voiceover/*.mp3
+!voiceover/PUT_VOICEOVER_TRACK_HERE.txt
+
+# ── Bundled binaries — too heavy for git (download ffmpeg separately) ──
+tools/*.exe
+
+# ── Build scratch + generated outputs ─────────────────────────
+_tmp_build/
+_tmp_timer/
+final/*.mp4

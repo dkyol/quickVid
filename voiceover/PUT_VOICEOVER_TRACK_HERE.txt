@@ -1,0 +1,13 @@
+OPTIONAL — only if you want spoken voiceover.
+
+Two ways to get a voiceover into your reel:
+
+1) You already have an audio file:
+   Drop your .mp3 / .wav / .m4a in this folder. That's it.
+
+2) You want it spoken in your ElevenLabs voice clone (the default):
+   Put your script text in ../prompts/script.txt, then run elevenlabs_voice.py
+   (see ReadME.MD). It writes vo_eleven.mp3 into this folder automatically.
+
+If you just want background MUSIC (not spoken words), do NOT put anything here.
+Make a silent reel and add music on Instagram's upload screen instead.

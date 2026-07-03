@@ -1,0 +1,27 @@
+PUT YOUR VOICEOVER / CAPTION SCRIPT HERE.
+
+Create a plain text file named  script.txt  in this folder and type or paste
+the words you want. That single file is used for BOTH of these:
+
+  1. Voiceover in your ElevenLabs voice clone
+     elevenlabs_voice.py reads it, speaks it in your cloned voice, and writes
+     ../voiceover/vo_eleven.mp3
+
+  2. Auto captions
+     make_reel.py --subtitles auto reads it to build the burned-in captions,
+     spread evenly across the reel.
+
+Tips:
+- Just plain text. No formatting needed.
+- Normal sentences and punctuation help the auto-captions break into clean,
+  readable lines.
+- Keep it within the reel's word budget (run script_fit.py to see it).
+- Named/located it differently? Point to it with
+  --script "your_file.txt"      (voiceover)
+  --sub-script "your_file.txt"  (captions)
+
+Difference between folders:
+  prompts/    = the TEXT you want spoken or captioned   (this folder)
+  voiceover/  = finished AUDIO (a track you recorded, or the generated .mp3)
+
+You can delete this note once you've added script.txt.

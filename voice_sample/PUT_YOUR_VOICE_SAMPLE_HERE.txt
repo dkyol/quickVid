@@ -1,0 +1,21 @@
+ONE-TIME VOICE CLONE SAMPLE — do this once, then every reel uses your voice.
+
+Drop ONE clean recording of your voice in this folder:
+  - 1 to 5 minutes, just you talking, minimal background noise/music.
+  - Audio (.wav .mp3 .m4a .flac) or video (.mp4 .mov) both work.
+
+Then create the clone (one time), in ElevenLabs:
+    1. Go to  https://elevenlabs.io/app/voice-lab
+       -> Add Voice -> Instant Voice Clone -> upload the sample from this folder
+       -> name it and save.
+    2. Get an API key: https://elevenlabs.io/app/settings/api-keys
+       and put it in .env as  ELEVEN_API_KEY=...  (see .env.example).
+    3. Come back here and run:
+         python elevenlabs_voice.py --check
+       It verifies your key and shows your voices with their ids.
+    4. Put your clone's id in .env as  ELEVEN_VOICE_ID=...
+
+After that, quickVid defaults to your cloned voice for every voiceover — you
+never touch this folder again. Keep the sample here for reference.
+
+You can delete this note once your clone is set up.
