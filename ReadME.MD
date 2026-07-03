@@ -4,10 +4,16 @@ Turn a pile of photos and clips into a finished **9:16 Instagram Reel** — the 
 length, in your own voice, with a title, captions, and an optional countdown timer
 — by having a short conversation with Claude. No editing software, no timeline.
 
-**Prerequisites (two things):**
-1. **Claude in VS Code, with this repo open.** Everything else (ffmpeg, the
-   scripts) is already in this folder.
-2. **An ElevenLabs voice clone already set up**, with your `ELEVEN_API_KEY` and
+**Prerequisites (three things):**
+1. **Claude in VS Code, with this repo open.** The scripts are already in this
+   folder.
+2. **ffmpeg + ffprobe in `tools/`.** These aren't shipped in the repo (too large).
+   Put `ffmpeg.exe` and `ffprobe.exe` in the **`tools/`** folder before building —
+   download from https://www.gyan.dev/ffmpeg/builds/ (grab the "essentials" build,
+   unzip, copy the two `.exe`s from its `bin/` into `tools/`), or install with
+   `winget install Gyan.FFmpeg`. Claude checks for these and will walk you through
+   it if they're missing.
+3. **An ElevenLabs voice clone already set up**, with your `ELEVEN_API_KEY` and
    `ELEVEN_VOICE_ID` filled into the real **`.env`** file (see "One-time setup"
    below). This is what lets quickVid narrate in your own voice. *(Only skippable
    if you never want a cloned-voice voiceover — i.e. you'll go silent or supply
@@ -58,7 +64,7 @@ quickVid/
 ├─ voiceover/    ← your own voiceover audio (only if not using the clone)
 ├─ prompts/      ← script.txt (voiceover narration and/or auto captions)
 ├─ final/        ← finished reels appear here, date-time stamped
-├─ tools/        ← bundled ffmpeg.exe + ffprobe.exe (already here)
+├─ tools/        ← PUT ffmpeg.exe + ffprobe.exe HERE (not shipped — see Prerequisites)
 ├─ make_reel.py          ← builds the reel (length, title, captions, timer)
 ├─ script_fit.py         ← how many script words fit a given reel length
 ├─ add_timer.py          ← overlays a countdown timer after the reel is built
@@ -97,6 +103,19 @@ quickVid narrates in **your own cloned voice**. Set this up once:
 
 **Have a short conversation, one topic at a time. Ask before generating; don't
 assume. Use sensible defaults and keep it moving.**
+
+### 0. Preflight — make sure ffmpeg is installed
+Before anything else, confirm `tools/ffmpeg.exe` and `tools/ffprobe.exe` exist
+(they're not shipped in the repo). If **either is missing**, stop and ask the user
+to install them — the build can't run without them. Point them to the easiest path
+and offer to help:
+- **Recommended:** `winget install Gyan.FFmpeg`, then copy `ffmpeg.exe` +
+  `ffprobe.exe` into `tools/`; **or**
+- Download the "essentials" build from https://www.gyan.dev/ffmpeg/builds/, unzip,
+  and copy the two `.exe`s from its `bin/` into `tools/`.
+
+Re-check that both files are present before continuing. Don't start the media step
+until ffmpeg is in place.
 
 ### 1. Media — get it into `media/`
 Ask the user for the **paths or links** to the photos/videos they want (a folder,

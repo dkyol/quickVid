@@ -47,7 +47,7 @@ BASE = "https://api.elevenlabs.io"
 DEFAULT_MODEL = os.environ.get("ELEVEN_MODEL_ID", "eleven_multilingual_v2")
 USD_PER_1K_CHARS = float(os.environ.get("ELEVEN_USD_PER_1K_CHARS", "") or 0)
 
-# Delivery presets (from the tuned settings in genericPlan.md).
+# Delivery presets (tuned per-style voice settings).
 VOICE_SETTINGS = {
     "warm":          {"stability": 0.38, "similarity_boost": 0.82, "style": 0.08, "use_speaker_boost": False},
     "energetic":     {"stability": 0.30, "similarity_boost": 0.85, "style": 0.25, "use_speaker_boost": True},
