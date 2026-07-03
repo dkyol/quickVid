@@ -259,6 +259,8 @@ zero across the whole reel, precise to the hundredth of a second.
 - Add it after building (`add_timer.py`) or in the same build (`make_reel.py
   --timer`). Top-center by default so it never collides with the title or captions.
   `--direction up` (or `--timer-direction up`) counts up instead.
+- Whenever the timer is shown, the label **"Estimated Time to Create"** is drawn
+  directly above it, so viewers know what the running clock represents.
 
 ---
 

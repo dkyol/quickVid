@@ -226,6 +226,9 @@ def write_timer_ass(path, video_dur, target_seconds, fps=FPS,
         "Effect, Text\n"
     )
     n = max(1, int(math.ceil(video_dur * fps)))
+    # The label rides just above the timer, at a smaller size, on its own line.
+    label_fs = max(24, int(fontsize * 0.45))
+    label = "{\\fs" + str(label_fs) + "}" + TIMER_LABEL + "{\\r}\\N"
     lines = [header]
     for i in range(n):
         t0 = i / fps
@@ -236,7 +239,7 @@ def write_timer_ass(path, video_dur, target_seconds, fps=FPS,
         val = target_seconds * (1 - frac) if direction == "down" \
             else target_seconds * frac
         lines.append(f"Dialogue: 0,{_ass_ts(t0)},{_ass_ts(t1)},Timer,,0,0,0,,"
-                     f"{_fmt_timer(val, show_hours)}\n")
+                     f"{label}{_fmt_timer(val, show_hours)}\n")
     with open(path, "w", encoding="utf-8") as f:
         f.writelines(lines)
 
