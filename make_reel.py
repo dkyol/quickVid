@@ -174,6 +174,8 @@ def write_srt(captions, total_dur, path):
 # as a per-frame .ass file (rock-solid vs. drawtext expression escaping) with
 # resolution in real pixels, so font size / margins are exact.
 _TIMER_ALIGN = {"top": 8, "middle": 5, "bottom": 2}
+# Caption shown directly above the running timer whenever the timer is used.
+TIMER_LABEL = "Estimated Time to Create"
 
 
 def _ass_ts(t):
