@@ -133,6 +133,9 @@ a list of files, or URLs). Then:
 - List what's now in `media/` back to the user in play order and confirm the order
   is right (offer to reorder, duplicate, or drop any by renaming).
 - Supported — photos: `.jpg .jpeg .png .webp`; videos: `.mp4 .mov .m4v .webm`.
+- **Screen recordings / landscape content:** if the user's media is a screen capture
+  or any landscape (16:9 or wider) source, add `--fit` to the build command. This
+  fits the content inside the 9:16 frame with black bars instead of cropping into it.
 
 ### 2. Length — the type of reel
 Ask, offering four options:
@@ -284,6 +287,9 @@ C:\Users\DKYLE\.conda\envs\api\python.exe make_reel.py --sound voiceover --targe
 # silent 12s max-reach reel: trim long clips to 3s, add auto captions
 C:\Users\DKYLE\.conda\envs\api\python.exe make_reel.py --sound none --target-seconds 12 --max-clip-seconds 3 --subtitles auto
 
+# screen recording / landscape content: fit inside the frame with black bars
+C:\Users\DKYLE\.conda\envs\api\python.exe make_reel.py --sound none --target-seconds 60 --max-clip-seconds 60 --speed-to-fit --fit --title "My Title"
+
 # AFTER building: overlay a countdown of how long it took you to make it
 C:\Users\DKYLE\.conda\envs\api\python.exe add_timer.py --seconds 23:00
 ```
@@ -291,7 +297,9 @@ C:\Users\DKYLE\.conda\envs\api\python.exe add_timer.py --seconds 23:00
 Useful `make_reel.py` flags: `--target-seconds 22` (hit a length) or
 `--image-seconds 4` (fixed per-photo time); `--max-clip-seconds 6` (trim clips);
 `--title "..."` with `--title-seconds` / `--title-position`; `--subtitles auto|file`;
-`--timer` with `--timer-seconds`; `--no-ken-burns`; `--fit-audio`.
+`--timer` with `--timer-seconds`; `--no-ken-burns`; `--fit-audio`;
+`--fit` (screen recordings / landscape content — letterbox instead of crop);
+`--speed-to-fit` (with `--max-clip-seconds`: speed up to fit duration rather than cut).
 
 ---
 

@@ -377,9 +377,14 @@ def plan_pacing(media, target, max_clip=None,
 _COVER = (f"scale={TARGET_W}:{TARGET_H}:force_original_aspect_ratio=increase,"
           f"crop={TARGET_W}:{TARGET_H},setsar=1,fps={FPS},format=yuv420p")
 
+# fit-and-pad: keep original aspect ratio, letterbox/pillarbox with black bars
+_FIT = (f"scale={TARGET_W}:{TARGET_H}:force_original_aspect_ratio=decrease,"
+        f"pad={TARGET_W}:{TARGET_H}:(ow-iw)/2:(oh-ih)/2,setsar=1,fps={FPS},format=yuv420p")
 
-def normalize_image(src, dst, dur, ken_burns=True):
-    if ken_burns:
+
+def normalize_image(src, dst, dur, ken_burns=True, fit=False):
+    base_filter = _FIT if fit else _COVER
+    if ken_burns and not fit:
         frames = int(dur * FPS)
         # gentle slow zoom-in (Ken Burns)
         vf = (
@@ -390,18 +395,24 @@ def normalize_image(src, dst, dur, ken_burns=True):
             f"s={TARGET_W}x{TARGET_H}:fps={FPS},setsar=1,format=yuv420p"
         )
     else:
-        vf = _COVER
+        vf = base_filter
     run(["-loop", "1", "-i", src, "-t", f"{dur:.3f}", "-vf", vf,
          "-c:v", "libx264", "-pix_fmt", "yuv420p", "-r", str(FPS), "-an", dst],
         os.path.basename(src))
 
 
-def normalize_video(src, dst, max_dur):
+def normalize_video(src, dst, max_dur, speed_to_fit=False, fit=False):
     args = ["-i", src]
     d = duration_of(src)
+    base_filter = _FIT if fit else _COVER
+    vf = base_filter
     if max_dur and d > max_dur:
-        args = ["-t", f"{max_dur:.3f}", *args]
-    run([*args, "-vf", _COVER,
+        if speed_to_fit:
+            speed = d / max_dur
+            vf = f"setpts=PTS/{speed:.6f}," + base_filter
+        else:
+            args = ["-t", f"{max_dur:.3f}", *args]
+    run([*args, "-vf", vf,
          "-c:v", "libx264", "-pix_fmt", "yuv420p", "-r", str(FPS), "-an", dst],
         os.path.basename(src))
 
@@ -429,8 +440,15 @@ def main():
     ap.add_argument("--max-clip-seconds", type=float, default=0.0,
                     help="Trim each source video to at most this many seconds "
                          "(0 = keep full length).")
+    ap.add_argument("--speed-to-fit", action="store_true",
+                    help="With --max-clip-seconds: speed up (timelapse) clips that "
+                         "exceed the limit instead of truncating them.")
     ap.add_argument("--no-ken-burns", action="store_true",
                     help="Disable the slow zoom on still photos.")
+    ap.add_argument("--fit", action="store_true",
+                    help="Fit media inside the 9:16 frame with black letterbox/pillarbox "
+                         "bars instead of cropping to fill. Use for screen recordings "
+                         "or any landscape content you don't want cropped.")
     ap.add_argument("--fit-audio", action="store_true",
                     help="With --sound voiceover: stretch the reel's last photo so "
                          "total video length matches the voiceover length.")
@@ -502,9 +520,10 @@ def main():
         ext = os.path.splitext(src)[1].lower()
         if ext in IMAGE_EXT:
             normalize_image(src, dst, image_seconds,
-                            ken_burns=not args.no_ken_burns)
+                            ken_burns=not args.no_ken_burns, fit=args.fit)
         else:
-            normalize_video(src, dst, max_clip)
+            normalize_video(src, dst, max_clip, speed_to_fit=args.speed_to_fit,
+                            fit=args.fit)
         segments.append(dst)
 
     # 2) Concatenate
