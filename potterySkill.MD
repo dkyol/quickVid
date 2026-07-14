@@ -37,10 +37,14 @@ file is the same engine (`make_reel.py`), pointed at a narrower, higher-polish f
 
 ## Get started (this is the whole thing)
 
-Open this folder in VS Code with Claude and type:
+Drag **this file (`potterySkill.MD`) into the Claude console** and type:
 
-> **let's throw a reel**
+> **let's get started**
 
+The file you drag in selects the workflow: **`potterySkill.MD`** for this one-video
+"process reel" format (flashing points, looped clip), or **`ReadME.MD`** for the
+general photos-and-clips builder. Both start with the same phrase — "let's get
+started" — so the dragged-in file is what tells Claude which recipe to follow.
 Claude reads this file and walks you through it — asking for your **one video**, the
 reel length, a title, your **script and the points to flash**, whether you want a
 voiceover and captions, and a timer — then loops the video to length, burns everything
@@ -105,7 +109,7 @@ Narration is in **your own cloned voice**. Set this up once:
 
 ---
 
-## FOR CLAUDE — run this when the user says "let's throw a reel"
+## FOR CLAUDE — run this when the user drags in `potterySkill.MD` and says "let's get started"
 
 **Have a short conversation, one topic at a time. Ask before generating; don't assume.
 Use sensible defaults and keep it moving.** This format is calm and deliberate — the
@@ -118,6 +122,12 @@ Gyan.FFmpeg`, then copy both `.exe`s into `tools/`; **or** the "essentials" buil
 https://www.gyan.dev/ffmpeg/builds/). Re-check both are present before continuing.
 
 ### 1. The video — get the ONE clip into `media/`
+**Always ask which file(s) to use at the start of every session — even if `media/`
+already has a clip in it.** A leftover video from a previous reel may still be sitting
+in `media/`; never silently reuse whatever happens to be there. First list anything
+already in `media/` and ask the user whether to use it or replace it — then remove
+whatever they don't want so only the chosen clip(s) remain before you build.
+
 Ask for the **path or link** to the single video (a satisfying, continuous process
 shot works best). Then:
 - Copy/move it into `media/` as `01_<name>.ext`. For a local path use `cp`; for a URL

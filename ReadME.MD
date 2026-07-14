@@ -23,10 +23,14 @@ length, in your own voice, with a title, captions, and an optional countdown tim
 
 ## Get started (this is the whole thing)
 
-Open this folder in VS Code with Claude and type:
+Drag **this file (`ReadME.MD`) into the Claude console** and type:
 
 > **let's get started**
 
+The file you drag in selects the workflow: **`ReadME.MD`** (this file) for the general
+photos-and-clips builder, or **`potterySkill.MD`** for the one-video "process reel"
+format with flashing points. Both start with the same phrase — "let's get started" —
+so the dragged-in file is what tells Claude which recipe to follow.
 Claude reads this file and walks you through it — asking for your media, the reel
 length, a title, whether you want a voiceover, captions, and a timer — then builds
 the reel and saves it to `final/` with a date-and-time stamp.
@@ -99,7 +103,7 @@ quickVid narrates in **your own cloned voice**. Set this up once:
 
 ---
 
-## FOR CLAUDE — run this when the user says "let's get started"
+## FOR CLAUDE — run this when the user drags in `ReadME.MD` and says "let's get started"
 
 **Have a short conversation, one topic at a time. Ask before generating; don't
 assume. Use sensible defaults and keep it moving.**
@@ -118,6 +122,12 @@ Re-check that both files are present before continuing. Don't start the media st
 until ffmpeg is in place.
 
 ### 1. Media — get it into `media/`
+**Always ask which file(s) to use at the start of every session — even if `media/`
+already has files in it.** Leftover media from a previous reel may still be sitting
+in `media/`; never silently reuse whatever happens to be there. First list anything
+already in `media/` and ask the user whether to use it, add to it, or clear it —
+then remove whatever they don't want so only the chosen files remain before you build.
+
 Ask the user for the **paths or links** to the photos/videos they want (a folder,
 a list of files, or URLs). Then:
 - Copy/move them into `media/`, renaming with numeric prefixes (`01_`, `02_`, …)
