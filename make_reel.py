@@ -200,7 +200,8 @@ def _fmt_timer(v, show_hours):
 
 
 def write_timer_ass(path, video_dur, target_seconds, fps=FPS,
-                    fontsize=72, position="top", direction="down"):
+                    fontsize=72, position="top", direction="down",
+                    font="Consolas"):
     """One dialogue event per frame, precise to 1/100 s, spanning the whole reel.
 
     direction="down" (default): starts at target_seconds and counts DOWN to 0
@@ -219,7 +220,7 @@ def write_timer_ass(path, video_dur, target_seconds, fps=FPS,
         "BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, "
         "Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, "
         "MarginR, MarginV, Encoding\n"
-        f"Style: Timer,Consolas,{fontsize},&H00FFFFFF,&H00000000,&H64000000,"
+        f"Style: Timer,{font},{fontsize},&H00FFFFFF,&H00000000,&H64000000,"
         f"1,0,0,0,100,100,0,0,1,4,1,{align},0,0,90,1\n\n"
         "[Events]\n"
         "Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, "
@@ -249,7 +250,7 @@ _TITLE_ALIGN = {"top": 8, "middle": 5, "bottom": 2}
 
 
 def write_title_ass(path, video_dur, text, seconds=3.0, fontsize=64,
-                    position="top"):
+                    position="top", font="Arial"):
     """A headline burned over the reel. Shows for `seconds` (0 = whole reel).
 
     Placed in the upper third by default so it clears bottom captions and the
@@ -270,7 +271,7 @@ def write_title_ass(path, video_dur, text, seconds=3.0, fontsize=64,
         "BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, "
         "Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, "
         "MarginR, MarginV, Encoding\n"
-        f"Style: Title,Arial,{fontsize},&H00FFFFFF,&H00000000,&H64000000,"
+        f"Style: Title,{font},{fontsize},&H00FFFFFF,&H00000000,&H64000000,"
         f"1,0,0,0,100,100,0,0,1,5,1,{align},80,80,{marginv},1\n\n"
         "[Events]\n"
         "Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, "
@@ -279,6 +280,78 @@ def write_title_ass(path, video_dur, text, seconds=3.0, fontsize=64,
     )
     with open(path, "w", encoding="utf-8") as f:
         f.write(header)
+
+
+# --- Timed on-screen "points" ------------------------------------------- #
+# Short lines that appear ONE AT A TIME, cued to the script, in a safe zone
+# that clears the subject (e.g. a pottery wheel centered in frame). Distinct
+# from the title (a single headline) and captions (the bottom band). Each
+# point fades in and out at its cue time for an elegant "flash" feel.
+_POINTS_ALIGN = {"top": 8, "middle": 5, "bottom": 2}
+
+
+def parse_points_file(path):
+    """Read a timed points file. Each non-empty, non-# line is:
+
+        START-END | TEXT
+
+    START/END accept 'SS', 'SS.cc', 'MM:SS', or 'HH:MM:SS'. Returns a list of
+    (start, end, text) tuples in file order.
+    """
+    points = []
+    for raw in Path(path).read_text(encoding="utf-8").splitlines():
+        line = raw.strip()
+        if not line or line.startswith("#"):
+            continue
+        if "|" not in line:
+            sys.exit(f"ERROR: points line missing '|': {raw!r}")
+        span, text = line.split("|", 1)
+        text = text.strip()
+        if "-" not in span:
+            sys.exit(f"ERROR: points line needs 'START-END' before '|': {raw!r}")
+        a, b = span.split("-", 1)
+        points.append((parse_duration(a.strip()), parse_duration(b.strip()), text))
+    if not points:
+        sys.exit(f"ERROR: no points found in {path}.")
+    return points
+
+
+def write_points_ass(path, video_dur, points, fontsize=52, position="top",
+                     fade_ms=250, font="Arial"):
+    """Burn timed on-screen points that fade in/out at their cue times.
+
+    Placed in the upper third by default (MarginV 430) so it clears a top title
+    and a bottom caption band, and leaves the center of frame — where the action
+    is — unobscured. Real-pixel resolution -> fontsize/margins are exact.
+    """
+    align = _POINTS_ALIGN.get(position, 8)
+    marginv = 0 if position == "middle" else 430
+    header = (
+        "[Script Info]\n"
+        "ScriptType: v4.00+\nWrapStyle: 0\n"
+        f"PlayResX: {TARGET_W}\nPlayResY: {TARGET_H}\n\n"
+        "[V4+ Styles]\n"
+        "Format: Name, Fontname, Fontsize, PrimaryColour, OutlineColour, "
+        "BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, "
+        "Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, "
+        "MarginR, MarginV, Encoding\n"
+        f"Style: Point,{font},{fontsize},&H00FFFFFF,&H00000000,&H64000000,"
+        f"1,0,0,0,100,100,0,0,1,4,1,{align},80,80,{marginv},1\n\n"
+        "[Events]\n"
+        "Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, "
+        "Effect, Text\n"
+    )
+    fade = "{\\fad(%d,%d)}" % (fade_ms, fade_ms)
+    lines = [header]
+    for start, end, text in points:
+        end = min(end, video_dur)
+        if end <= start:
+            continue
+        safe = (text.replace("{", "(").replace("}", ")").replace("\n", "\\N"))
+        lines.append(f"Dialogue: 0,{_ass_ts(start)},{_ass_ts(end)},Point,,0,0,0,,"
+                     f"{fade}{safe}\n")
+    with open(path, "w", encoding="utf-8") as f:
+        f.writelines(lines)
 
 
 def parse_duration(s):
@@ -468,6 +541,22 @@ def main():
                     default="top", help="Where the title sits (default top).")
     ap.add_argument("--title-fontsize", type=int, default=64,
                     help="Title font size in px (default 64).")
+    ap.add_argument("--points", default=None,
+                    help="Path to a timed on-screen points file (lines: "
+                         "'START-END | TEXT'). Each point fades in/out at its cue "
+                         "time, aligned to the script, in a safe zone that clears "
+                         "the subject. Distinct from --title and --subtitles.")
+    ap.add_argument("--points-position", choices=["top", "middle", "bottom"],
+                    default="top", help="Where the points sit (default top).")
+    ap.add_argument("--points-fontsize", type=int, default=52,
+                    help="Points font size in px (default 52).")
+    ap.add_argument("--font", default="Arial",
+                    help="Font family for the title and points (default Arial). "
+                         "Must be installed on the system, e.g. 'Bahnschrift', "
+                         "'Segoe UI Semibold', 'Candara'. The timer stays monospace.")
+    ap.add_argument("--loop-to-target", action="store_true",
+                    help="Loop the media to fill --target-seconds. Use when one "
+                         "short video should run the whole reel length.")
     ap.add_argument("--timer", action="store_true",
                     help="Burn a running timer (1/100 s) over the whole reel.")
     ap.add_argument("--timer-seconds", default=None,
@@ -482,6 +571,10 @@ def main():
                     default="top", help="Where the timer sits (default top).")
     ap.add_argument("--timer-fontsize", type=int, default=72,
                     help="Timer font size in px (default 72).")
+    ap.add_argument("--timer-font", default=None,
+                    help="Font for the countdown timer. Defaults to --font. Pass a "
+                         "monospace font (e.g. 'Consolas') to keep the digits from "
+                         "shifting width as they tick.")
     args = ap.parse_args()
     t_start = time.time()
 
@@ -537,6 +630,22 @@ def main():
          video_only], "concat")
 
     vid_dur = duration_of(video_only)
+
+    # 2b) Loop the stitched media to fill the target length (e.g. one short
+    # video that should run the whole reel). Trims to the exact target.
+    if args.loop_to_target:
+        if args.target_seconds is None:
+            sys.exit("ERROR: --loop-to-target needs --target-seconds <length>.")
+        target = parse_duration(args.target_seconds)
+        if vid_dur < target - 0.05:
+            looped = os.path.join(TMP_DIR, "video_looped.mp4")
+            run(["-stream_loop", "-1", "-i", video_only, "-t", f"{target:.3f}",
+                 "-c:v", "libx264", "-pix_fmt", "yuv420p", "-r", str(FPS), "-an",
+                 looped], "loop")
+            video_only = looped
+            vid_dur = duration_of(video_only)
+            print(f"Looped media {vid_dur:.1f}s to fill the {target:g}s target.")
+
     budget = word_budget(vid_dur)
     print(f"\nStitched video length: {vid_dur:.1f}s")
     print(f"Script budget: about {budget} words of voiceover fit this reel "
@@ -628,7 +737,8 @@ def main():
         write_title_ass(title_ass, base_dur, args.title,
                         seconds=args.title_seconds,
                         fontsize=args.title_fontsize,
-                        position=args.title_position)
+                        position=args.title_position,
+                        font=args.font)
         withtitle = os.path.join(TMP_DIR, "withtitle.mp4")
         burn_subs(current, withtitle, "title.ass")
         current = withtitle
@@ -636,7 +746,22 @@ def main():
                 else f"first {min(args.title_seconds, base_dur):.1f}s")
         print(f"Title: \"{args.title}\" ({args.title_position}, {span}).")
 
-    # 6) Timer overlay (optional burn-in)
+    # 6) Timed on-screen points (optional burn-in)
+    if args.points:
+        if not os.path.exists(args.points):
+            sys.exit(f"ERROR: --points file not found: {args.points}")
+        pts = parse_points_file(args.points)
+        points_ass = os.path.join(TMP_DIR, "points.ass")
+        write_points_ass(points_ass, base_dur, pts,
+                         fontsize=args.points_fontsize,
+                         position=args.points_position,
+                         font=args.font)
+        withpoints = os.path.join(TMP_DIR, "withpoints.mp4")
+        burn_subs(current, withpoints, "points.ass")
+        current = withpoints
+        print(f"Points: {len(pts)} on-screen cue(s) ({args.points_position}).")
+
+    # 7) Timer overlay (optional burn-in)
     if args.timer:
         target = (parse_duration(args.timer_seconds)
                   if args.timer_seconds is not None else base_dur)
@@ -644,7 +769,8 @@ def main():
         write_timer_ass(ass_path, base_dur, target,
                         fps=FPS, fontsize=args.timer_fontsize,
                         position=args.timer_position,
-                        direction=args.timer_direction)
+                        direction=args.timer_direction,
+                        font=args.timer_font or args.font)
         withtimer = os.path.join(TMP_DIR, "withtimer.mp4")
         burn_subs(current, withtimer, "timer.ass")
         current = withtimer

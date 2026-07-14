@@ -1,1 +1,1 @@
-My biggest takeaway from Cannes is that creators now have the tools to create faster and more efficiently than ever before. The hard part remains what — and how — to create.
+Creating Reels doesn't have to mean wrestling with editing software. You really only need three things: Claude, running inside VS Code, and a GitHub repo that holds a single prompt and a little code. The prompt tells Claude how to stitch your clips, add captions, and a voiceover. Just drop your media, say the words, and watch it come together. Your next Reel is ready to build.
