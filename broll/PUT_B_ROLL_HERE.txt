@@ -1,0 +1,12 @@
+Drop b-roll clips (.mp4/.mov) here and reference them from your timeline
+.json — they overlay as timed panels via compose_reel.py.
+
+Landscape footage is fine: the cover-crop band trims it cleanly, and the
+timeline's "from" field pulls the best seconds out of a long clip.
+
+Where to find footage (details in ReadME.MD > "Sourcing B-roll"):
+  1. Screen-record public dashboards / live maps / rankings (free, credible)
+  2. Free stock: pexels.com, pixabay.com, mixkit.co (commercial-use licenses)
+  3. Public-domain U.S. agency footage: NASA, USFS/BLM/NIFC, NOAA
+  4. Viral/eyewitness clips are copyrighted — prefer a stock or public-domain
+     equivalent; reposting risks a strike on a monetized account

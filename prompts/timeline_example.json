@@ -1,0 +1,22 @@
+{
+  "aroll": "aroll/take1.mp4",
+  "fit": false,
+  "voice": null,
+  "music": null,
+  "loudnorm": true,
+  "overlays": [
+    { "type": "chip", "text": "🚨 Nobody is Talking About This",
+      "start": 0.4, "end": 4.5, "pos": "upper", "fontsize": 58 },
+
+    { "type": "video", "file": "broll/smoke.mp4", "from": 3,
+      "start": 4.5, "end": 10, "pos": "top", "width": 1.0, "height": 0.38,
+      "slide": "top", "fade": 0.3 },
+
+    { "type": "image", "file": "cards/card1.png",
+      "start": 11, "end": 18, "pos": "center", "height": 0.55, "fade": 0.3 },
+
+    { "type": "image", "file": "cards/card2.png",
+      "start": 19, "end": 26, "pos": "top", "width": 1.0, "height": 0.42,
+      "slide": "top", "fade": 0.3 }
+  ]
+}

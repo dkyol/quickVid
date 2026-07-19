@@ -1,0 +1,11 @@
+Drop your talking-head base video here (the "A-roll") for compose_reel.py.
+
+Two ways to get one:
+  1. Record yourself on your phone: 9:16 portrait, good light, mic close,
+     talking the script straight to camera.
+  2. Generate it with your HeyGen avatar clone: paste the script into HeyGen,
+     pick your avatar + voice, portrait/9:16 output, download the .mp4 here.
+
+The A-roll's own speech is KEPT and loudness-normalized — it runs full-screen
+under the whole reel while cards, b-roll and hook chips overlay on top.
+Its length IS the reel's length.

@@ -65,11 +65,17 @@ That's the intended path. You can also run the steps by hand (see the bottom).
 quickVid/
 ├─ voice_sample/ ← ONE-TIME: drop a sample of your voice here to clone it
 ├─ media/        ← your photos & videos (Claude puts them here for you)
+├─ aroll/        ← talking-head base video: phone selfie or HeyGen avatar clip
+├─ broll/        ← b-roll clips used as timed overlay panels (optional)
+├─ chips/        ← rendered hook-chip PNGs (make_chip.py output)
 ├─ voiceover/    ← your own voiceover audio (only if not using the clone)
-├─ prompts/      ← script.txt (voiceover narration and/or auto captions)
+├─ prompts/      ← script.txt, timeline .json, caption .srt files
 ├─ final/        ← finished reels appear here, date-time stamped
 ├─ tools/        ← PUT ffmpeg.exe + ffprobe.exe HERE (not shipped — see Prerequisites)
-├─ make_reel.py          ← builds the reel (length, title, captions, timer)
+├─ make_reel.py          ← slideshow builder (length, title, captions, timer)
+├─ compose_reel.py       ← talking-head compositor (overlays over an A-roll)
+├─ make_chip.py          ← hook-text chips ("🚨 …") as transparent PNGs
+├─ make_cards.py         ← 9:16 infographic cards (toolkit + per-video deck)
 ├─ script_fit.py         ← how many script words fit a given reel length
 ├─ add_timer.py          ← overlays a countdown timer after the reel is built
 ├─ elevenlabs_voice.py   ← voice-clone setup + turns a script into your voiceover
@@ -107,6 +113,12 @@ quickVid narrates in **your own cloned voice**. Set this up once:
 
 **Have a short conversation, one topic at a time. Ask before generating; don't
 assume. Use sensible defaults and keep it moving.**
+
+**Which builder?** This flow (steps 0-9) is the **slideshow** path: photos and
+clips flashed in sequence by `make_reel.py`. If the user wants the
+**talking-head / creator format** — a person (or their HeyGen avatar) on camera
+the whole time, with cards, b-roll and a hook chip layered over them — skip to
+**"FOR CLAUDE — talking-head recipe"** further down instead.
 
 ### 0. Preflight — make sure ffmpeg is installed
 Before anything else, confirm `tools/ffmpeg.exe` and `tools/ffprobe.exe` exist
@@ -274,6 +286,167 @@ zero across the whole reel, precise to the hundredth of a second.
   `--direction up` (or `--timer-direction up`) counts up instead.
 - Whenever the timer is shown, the label **"Estimated Time to Create"** is drawn
   directly above it, so viewers know what the running clock represents.
+
+---
+
+## Talking-head reels — the creator format (`compose_reel.py` + `make_chip.py`)
+
+`make_reel.py` **concatenates**: one clip at a time, source audio dropped. The
+reels that consistently outperform are built the other way around — they
+**composite**: a person talks to camera full-screen for the whole reel (the
+**A-roll**), and the evidence slides in as timed panels *over* them. Notes
+from comparing a top-performing talking-head wildfire explainer against a
+cards-only slideshow of the same story:
+
+- **A face + continuous voice is the retention engine.** Faces stop the
+  scroll; speech sets the pace so the viewer never decides to keep watching.
+  A silent slideshow asks the viewer to *read* — that's work, and they swipe.
+- **Something must move every few seconds.** A static card held 13s is an
+  eternity; the same card as a 6s panel over a talking head is a highlight.
+- **The hook is decided in the first 2 seconds**: dramatic first frame plus a
+  text chip like "🚨 Nobody is Talking About This".
+- **Receipts beat polish**: real footage, live maps and raw charts read as
+  credible. Keep the polished cards — but layer them over a human voice.
+
+### Get an A-roll (two ways)
+
+1. **Record yourself**: phone camera, 9:16 portrait, good light, mic close,
+   talking the script straight into the lens.
+2. **HeyGen avatar clone**: paste the script into HeyGen (your avatar + your
+   cloned voice), portrait/9:16 output, download the .mp4. If Claude has the
+   HeyGen connector, it can drive this from the script directly.
+
+Drop the file in **`aroll/`**. Its speech is **kept** and loudness-normalized;
+its length *is* the reel's length (~150 words of script per minute).
+
+### Hook chips
+
+```
+python make_chip.py --text "🚨 Nobody is Talking About This"
+```
+
+Renders a transparent PNG chip — rounded dark lozenge, Segoe UI Black, real
+color emoji — into `chips/`. `--style light` inverts it; `--fontsize` /
+`--max-width` tune size and wrapping. Timelines can also render chips inline
+(`"type": "chip"`) so you rarely run this by hand.
+
+### The timeline (what plays over the A-roll, and when)
+
+A JSON file (see `prompts/timeline_example.json`):
+
+```json
+{
+  "aroll": "aroll/take1.mp4",
+  "overlays": [
+    { "type": "chip",  "text": "🚨 Nobody is Talking About This",
+      "start": 0.4, "end": 4.5, "pos": "upper" },
+    { "type": "video", "file": "broll/smoke.mp4", "from": 3,
+      "start": 4.5, "end": 10, "pos": "top", "width": 1.0, "height": 0.38,
+      "slide": "top", "fade": 0.3 },
+    { "type": "image", "file": "cards/card1.png",
+      "start": 11, "end": 18, "pos": "center", "height": 0.55 }
+  ]
+}
+```
+
+Overlay fields: `start`/`end` (seconds on screen) · `pos` = `top / upper /
+center / lower / bottom` (or `x`/`y` fractions 0-1) · `width`/`height` as
+fractions of the frame — give **both** to cover-crop into that box (the
+full-width band over a talking head), give **one** to keep the media's own
+aspect (a whole card, scaled) · `fade` seconds (default 0.25) · `slide` =
+`top/bottom/left/right` ease-in · `from` = source offset for video clips.
+Top-level extras: `"voice"` (audio file that replaces the a-roll's track),
+`"music"` (`{"file", "gain_db", "duck"}` — a bed auto-ducked under speech),
+`"loudnorm"` (default true), `"fit"` (letterbox the a-roll instead of crop).
+
+### Build it
+
+```
+python compose_reel.py prompts/timeline.json
+python compose_reel.py prompts/timeline.json --srt prompts/captions.srt
+```
+
+Output: `final/composed_<datetime>.mp4` (1080x1920, 30 fps, audio kept).
+`--srt` burns captions in the same style as `make_reel.py`.
+
+### Sourcing B-roll — filling `broll/`
+
+Drop any `.mp4/.mov` into `broll/` and reference it from the timeline. Two
+things make sourcing easy: the cover-crop band means **landscape footage works
+fine** (a 16:9 clip cropped into a top band loses little), and the `"from"`
+field pulls the best 5 seconds out of any long clip. Where to find footage,
+in order of preference:
+
+1. **Screen-record public dashboards and live sites** — the most credible
+   asset there is, and free. Government data portals, live tracker maps
+   (wildfires, flights, earthquakes, weather), official rankings and price
+   boards: open the page in a browser and screen-record it (Windows:
+   Win+Alt+R Game Bar; or record your phone scrolling the site). Leave the
+   site's own logo, timestamp and legend in frame — the raw UI chrome is
+   what makes it read as a *receipt*, not a graphic. Claude can automate
+   these captures with a browser.
+2. **Free licensed stock** — Pexels (pexels.com), Pixabay (pixabay.com),
+   Mixkit (mixkit.co): free for commercial use, no attribution required,
+   searchable by keyword ("wildfire aerial", "city timelapse"...). Filter
+   vertical if you can, but landscape is fine (see above). Both Pexels and
+   Pixabay have free APIs if you want fetching scripted.
+3. **Public-domain government footage** — U.S. federal agency footage is
+   generally public domain: NASA (images.nasa.gov), USFS/BLM/National
+   Interagency Fire Center, NOAA, the National Archives. Slower to search
+   than stock, but often the most dramatic real-event footage you can use
+   with zero rights risk.
+4. **Viral / eyewitness clips — caution.** Commentary creators repost these
+   constantly and it clearly performs, but it's someone else's copyrighted
+   footage: a strike risk on an account you're growing, especially
+   monetized. Prefer a stock or public-domain equivalent of the same shot;
+   if a specific clip is irreplaceable, credit the source on screen and keep
+   it short inside your own commentary — and know it can still be struck.
+5. **Charts: plot the data yourself** instead of screenshotting someone's
+   graphic. Public datasets (government statistics portals, agency
+   databases) + matplotlib or the `make_cards.py` toolkit give you a clean
+   chart you own — cite the dataset on the card face, like the source
+   footers the cards already use.
+
+---
+
+## FOR CLAUDE — talking-head recipe (user wants the creator format)
+
+1. **Script first.** Ask for the topic and hook. Word budget = target length
+   × ~150 wpm (a 60s reel ≈ 150 words). Write/collect the script into
+   `prompts/script.txt`. The first sentence must be the hook.
+2. **Get the A-roll.** Ask: **"Record yourself reading it, or generate it
+   with your HeyGen clone?"** For HeyGen: give the user the final script to
+   paste (or drive the HeyGen connector if available) — portrait 9:16 —
+   and have the .mp4 land in `aroll/`. Don't proceed without the A-roll;
+   everything is timed against it.
+3. **Build the assets** while/after the A-roll is made: a card deck
+   (`make_cards.py` — swap the DECK half), b-roll clips into `broll/`
+   (see "Sourcing B-roll" above — prefer dashboard screen-captures, free
+   stock, and public-domain agency footage; warn before using viral clips),
+   chip text(s) agreed with the user.
+4. **Write the timeline** to `prompts/timeline_<topic>.json`, timed against
+   the script at ~150 wpm (or probe the A-roll for its real length). Rules of
+   thumb: hook chip at ~0.4-4.5s; first panel on screen by ~5s; something new
+   every 4-7s; no overlay longer than ~8s; panels in `top`/`upper`/`center`
+   so they clear the caption band; face visible at least a third of the time.
+5. **Compose** with `compose_reel.py`. Offer burned-in captions: hand-write a
+   `.srt` cued to the script (most viewers are muted) and pass `--srt`.
+6. **Report** the output path and length; remind that music can be added on
+   Instagram if no bed was mixed in.
+
+---
+
+## Infographic / data cards (`make_cards.py`)
+
+9:16 cards (1080x1920) drawn with PIL at 2x and downsampled. The file is two
+halves: a reusable **TOOLKIT** (background, header/footer chrome, panels,
+stat rows, spline/tapered-limb primitives, a small map projection, icons) and
+a per-video **DECK** (the `card_*()` functions). To make cards for a new
+reel, replace only the DECK half and re-run `python make_cards.py [out_dir]`.
+Keep text minimal (the toolkit's `header` + `stat_row` + one `para` is a full
+card); put years/dates only in source footers so card faces don't date. Use
+the cards as slideshow frames (`make_reel.py`) or as timed panels over a
+talking head (`compose_reel.py`).
 
 ---
 
