@@ -436,6 +436,180 @@ in order of preference:
 
 ---
 
+## Repurposing a raw recording (webinar, long screen capture) into clips
+
+There's a third source format besides "photos/clips you shot" and "a fresh
+A-roll you recorded": a **long existing recording** (a webinar, a demo call,
+a screen capture) that needs to be chopped into several short, cropped clips
+— reusing the speaker's real voice, but showing only specific regions of the
+screen (e.g. a product demo pane) and skipping other parts entirely (slides,
+the presenter's face, off-topic sections). There's no single script for this
+yet — it's hand-built per project with `tools/ffmpeg.exe` directly — but the
+workflow and gotchas below make the next one much faster.
+
+### The workflow
+
+1. **Map the recording first.** Extract the audio and transcribe it
+   (`whisper`, `small` model is enough) to get timestamped text for every
+   section — this is how you find quotable lines and locate topic
+   boundaries. **`whisper`'s internal audio loader shells out to `ffmpeg` on
+   PATH** — it does NOT know about `tools/ffmpeg.exe`. Prepend the tools dir
+   for that one call: `PATH="$PATH:/path/to/quickVid/tools" python
+   transcribe_script.py` (bash) — otherwise it fails with a `WinError 2`
+   `FileNotFoundError` that has nothing to do with the transcription itself.
+2. **Build a coarse contact sheet** (one frame every ~30s, tiled with
+   timestamp labels via PIL) to map the recording's *sections* — where the
+   slides are, where a live demo starts, where a governance/legal section
+   begins, etc. This is enough resolution to plan which sections are usable
+   at all.
+3. **Before trusting any specific clip window inside a chosen section,
+   re-sample that section at 0.5-1s resolution.** A coarse 30s-grid sheet
+   makes content look far steadier than it is — a produced sizzle/intro
+   video can cut to a brand-new scene every 0.5-1s. Picking a 3-4s window
+   off the coarse sheet risks spanning three unrelated scenes. Confirm
+   stability at fine resolution first, then pick the window.
+4. **Calibrate each crop rectangle by iterating on the actual crop, not by
+   eyeballing a scaled reference image.** Drawing a coordinate grid over a
+   downscaled screenshot and reading pixel values off it is unreliable —
+   labels on a scaled-down annotated image are very easy to misread by a
+   large factor (a 2x+ error is easy to make and easy to miss). Instead:
+   crop a generous guess region straight out of the source with ffmpeg, view
+   the actual result, then tighten in 1-2 more passes. It's slower per crop
+   but it's the only version that's actually correct.
+5. **Extract each clip with the crop baked in**, using the blur-fill filter
+   below to go from landscape screen content to 9:16 with no black bars and
+   no lost content.
+6. **Verify every extracted clip — and the final muxed output — by decoding
+   it fully and sequentially, not by spot-checking with `-ss`.** See the
+   `-ss` warning below; this step caught real problems (a clip whose window
+   ran long enough to drift into an unrelated scene) that spot-checks with
+   `-ss` completely missed, because the spot-check frames themselves were
+   sometimes wrong.
+7. **Concat the verified clips**, generate/attach audio (either the
+   speaker's real voice trimmed to clean sentence boundaries, or a fresh
+   script through `elevenlabs_voice.py` for a montage assembled from
+   unrelated source moments), then pad the video to the audio's length
+   (`tpad=stop_mode=clone:stop_duration=<N>`, holding the last frame) rather
+   than stretching or trimming the audio.
+
+### `-ss` is not reliable for spot-checking — verify by full sequential decode
+
+`ffmpeg -ss <t> -i file -frames:v 1 out.png` (seeking, whether placed before
+or after `-i`) can silently return a frame from a **different moment than
+requested** on some encodes/filter combinations — not a rounding-error few
+frames off, but a completely different scene. This showed up repeatedly:
+a "confirmed" timestamp would show one thing via a plain `-ss` grab, then
+show something else entirely once a crop filter was added, then show yet
+another thing on a fresh re-grab of the exact same command. It affects
+**verification** just as much as **extraction** — don't trust a `-ss`
+screenshot of a finished render either.
+
+The fix: decode the clip (or the region of interest) **sequentially from the
+start**, no seeking at all, and sample with the `fps` filter:
+
+```
+ffmpeg -i clip.mp4 -vf "fps=2,scale=160:-1" frames/f_%03d.png
+```
+
+Tile the results into a contact sheet and actually look through the whole
+thing before trusting a clip's content. It's more frames than a couple of
+spot checks, but it's the only version of "verified" that's actually true.
+This is slower, so reserve it for: (a) picking clip windows in a
+fast-cutting section, (b) checking every extracted clip before concat, and
+(c) checking the final render before calling it done — not for quick casual
+looks where being roughly right is fine.
+
+### Blur-fill: cropping a landscape screen recording into clean 9:16
+
+A screen recording is landscape (and the content pane inside it is usually
+*also* landscape, e.g. a 16:9 embedded video within an even wider screen
+capture) — going to 9:16 either crops away real content or, with
+`make_reel.py --fit`, leaves large plain black bars (at these aspect ratios,
+often 60%+ of the frame). Better: crop tight to the region of interest, then
+fill the leftover vertical space with a blurred, zoomed copy of the same
+footage instead of black — the standard "make landscape read as native
+vertical" technique. Not exposed as a flag anywhere yet; built per clip as a
+`filter_complex`:
+
+```
+ffmpeg -ss <start> -t <dur> -i source.mp4 -filter_complex \
+"[0:v]crop=<w>:<h>:<x>:<y>,setsar=1,split=2[bg][fg]; \
+ [bg]scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,gblur=sigma=35,eq=brightness=-0.05[bgblur]; \
+ [fg]scale=1080:-2:force_original_aspect_ratio=decrease[fgs]; \
+ [bgblur][fgs]overlay=(W-w)/2:(H-h)/2:format=auto,format=yuv420p[v]" \
+-map "[v]" -an -r 30 -c:v libx264 -crf 18 -pix_fmt yuv420p out.mp4
+```
+
+`crop=<w>:<h>:<x>:<y>` is the calibrated region of interest (step 4 above).
+Every distinct screen layout in the source (a different app pane, a
+different slide template) needs its own calibrated crop rect — a rect
+measured against one layout will silently crop the wrong thing if reused
+against a different one, even a visually similar one.
+
+### Other things that cost real time
+
+- **A recording's UI layout is not constant.** The same "branded card"
+  section can switch between a big full-bleed video pane and a small
+  YouTube-embed-with-chrome (title bar, progress bar, captions, a
+  "Watch on YouTube" button) within the same minute. Recalibrate the crop
+  rect per layout, not just per section.
+- **Watch for a scene change disguised as a glitch.** Content that looks
+  like an error (e.g. a clip drifting into an unrelated scene) is sometimes
+  real footage — the source ad/video genuinely cuts there. Don't assume
+  "weird visual" always means "bug in my pipeline"; check the source at
+  that exact timestamp before concluding either way.
+- **A ~50min 4K screen recording transcribes in a few minutes on CPU** with
+  `whisper`'s `small` model — no need for a GPU or a smaller model for a
+  one-off job like this.
+
+### The generic principles behind all of the above
+
+The specifics above (ffmpeg, whisper, this webinar) will date; these won't.
+Worth re-reading before *any* task that involves extracting, cropping, or
+verifying pieces of a larger source — video or otherwise:
+
+1. **Never verify with the same mechanism that produced the artifact.**
+   Picking clip timestamps with `-ss` and then "verifying" them with more
+   `-ss` made a systematic seeking error invisible, because the check
+   shared the broken assumption with the extraction. The bug only surfaced
+   once verification used a *different* method (full sequential decode).
+   If a tool can lie to you, checking your work with the same tool doesn't
+   help.
+2. **Coarse sampling creates false confidence, not just imprecision.** A
+   30-second-interval overview made content look stable for many seconds;
+   reality changed every 0.5s in places. The risk isn't that coarse data is
+   less accurate — it's that it looks trustworthy enough to stop checking.
+   Sample rate has to match the actual rate of change, which is often
+   unknown until you check at finer resolution.
+3. **Prefer empirical iteration over reading measurements off a
+   representation.** Eyeballing pixel coordinates from a scaled, annotated
+   reference image caused a 2x+ error, made easily and missed easily.
+   "Crop a guess, look at the real result, adjust" was slower per attempt
+   but correct every time — a proxy for the truth is worse than a slower
+   loop against the truth itself.
+4. **An anomaly is data until proven to be a bug.** Unexpected content
+   (a scene that looked like corruption, a clip that drifted somewhere
+   unrelated) turned out to be real source footage both times it came up.
+   Assuming "weird output = my pipeline is broken" and patching it would
+   have produced a confident, silent, wrong fix; checking the source first
+   avoided that.
+5. **The dangerous failures are silent, not loud.** The seeking bug never
+   threw an error — it returned a plausible-looking wrong frame. A
+   verification step only earns its keep if it would actually catch a
+   wrong-but-plausible answer, not just a crash.
+6. **Match verification cost to the stakes at that checkpoint.** Full
+   sequential-decode verification is slow, so it isn't for every casual
+   look — spend it where being wrong would propagate: after extraction,
+   before concat, before calling a render final. Cheap checks elsewhere,
+   expensive checks at commit points.
+7. **Pay down calibration cost once, then trust the reusable primitive.**
+   The second reel built this way went faster than the first not because
+   the footage was easier, but because the crop-calibration method and the
+   blur-fill filter chain were already trustworthy — the remaining work was
+   *applying* a known-good method, not re-deriving it.
+
+---
+
 ## Infographic / data cards (`make_cards.py`)
 
 9:16 cards (1080x1920) drawn with PIL at 2x and downsampled. The file is two

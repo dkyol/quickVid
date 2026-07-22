@@ -1,9 +1,7 @@
 # prompts/points.txt — one point per line:  START-END | TEXT
-# Cued to the (slowed) voiceover. Upper-third, fade in/out.
-0:00-0:03  | Raw clips → Polished Reel
-0:04-0:08  | Claude (in VS Code)
-0:08-0:11  | VS Code
-0:11-0:16  | A GitHub repo
-0:16-0:22  | One prompt · a little code
-0:22-0:27  | Drop media → say the words
-0:27-0:30  | Your next Reel awaits
+# Cued to the (slowed) screen-recording; high-level, no event specifics.
+0:00-0:05  | Media pipelines, built automatically
+0:05-0:11  | Text + audio + image + video
+0:11-0:17  | Blended into one piece
+0:17-0:24  | Self-correcting loop
+0:24-0:30  | Effortless, self-improving content
