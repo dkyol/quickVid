@@ -48,3 +48,6 @@ tools/*.exe
 _tmp_build/
 _tmp_timer/
 final/*.mp4
+
+# ── Carving project working dir (seeds, reference frames, renders) ──
+wolf_watermelon/

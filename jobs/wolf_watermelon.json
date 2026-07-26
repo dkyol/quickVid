@@ -1,0 +1,25 @@
+{
+  "project": "wolf_watermelon",
+  "subject": "snarling gray wolf head",
+  "material": "watermelon",
+  "style": "hyperrealistic fruit carving, macro process video",
+  "model": "kling-v2-master",
+  "mode": "pro",
+  "aspect_ratio": "9:16",
+  "cfg_scale": 0.5,
+  "output": {
+    "crossfade": 0.4,
+    "keep_source_audio": true,
+    "music": null
+  },
+  "segments": [
+    {
+      "name": "01_carve",
+      "stage": "deep_carving",
+      "duration": 10,
+      "seconds": 10,
+      "start_image": "seed_start_grok",
+      "prompt_extra": "Start exactly from the drawn black wolf outline on the whole green watermelon and carve continuously: the knife shaves away curling strips of green rind that fall off, revealing the pale carved rind as layered fur with the melon's green striations as shading, the dark green rind kept as the nose and dark markings, then cuts the muzzle open to expose bright red flesh as the snarling mouth and tongue with pale carved fangs, ending on the finished snarling gray wolf watermelon carving. Rendered entirely in the melon's own green, white and red layers; not painted, not grey."
+    }
+  ]
+}
