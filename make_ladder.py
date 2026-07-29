@@ -69,6 +69,37 @@ MASTER_PROMPT = (
     "airbrush. No text, no watermark, no phone UI."
 )
 
+# Image-conditioned variant: the subject comes from a REFERENCE IMAGE (a
+# logo, a photo, a drawing) instead of a text description. Uses the edit
+# endpoint (image input) rather than pure text-to-image, so the model has
+# the actual shape/lines to reproduce instead of improvising from a noun
+# phrase — this is what "carve this logo" needs that "carve a wolf head"
+# doesn't. Same palette/border/not-alive rules as MASTER_PROMPT; the only
+# difference is telling it to reproduce the reference exactly.
+REFERENCE_MASTER_PROMPT = (
+    "Photorealistic vertical 9:16 photograph, soft flat diffused daylight, no "
+    "hard shadows, plain light grey seamless background. A whole watermelon "
+    "fills most of the frame, held steady by two hands. Carve the attached "
+    "reference image's exact design — same shapes, same proportions, same "
+    "silhouette, do not redesign or simplify it — into the rind in SHALLOW "
+    "BAS-RELIEF, at most one or two centimeters deep, cut INTO the curved "
+    "surface, nothing protruding beyond the melon's original surface, the "
+    "melon's smooth round silhouette unbroken. The design reads through "
+    "layer contrast alone: dark green outer rind left uncarved for the "
+    "reference's darkest lines and shapes, pale green-white inner rind "
+    "exposed for everything else, and a small area of vivid red flesh ONLY "
+    "if the reference has an open mouth or cut to reveal. The ONLY colors in "
+    "frame are watermelon colors — dark green rind, pale green-white inner "
+    "rind, cream pith, red flesh; no grey, no black, no brown anywhere, and "
+    "NONE of the reference image's own colors — translate it into rind "
+    "layers, do not paint it. The rest of the visible rind around the design "
+    "is covered edge to edge in a shallow carved decorative leaf pattern — "
+    "no smooth untouched rind in frame. It is a carved watermelon, like "
+    "traditional Thai fruit carving: not a sticker, not painted, not a flat "
+    "print of the reference. Matte natural texture, no glow, no airbrush. No "
+    "text, no watermark, no phone UI."
+)
+
 # ---------------------------------------------------------------------------
 # Regression rungs: edits applied to the master, ordered latest -> earliest.
 # Every rung inherits the master's framing, so the ladder is monotonic by
@@ -130,16 +161,22 @@ LADDER = [
      "whole decorative border stay EXACTLY the flat dark line-art drawing on "
      "intact dark green rind. A few rind shavings lie on the surface below "
      "the melon. No red flesh anywhere. " + KEEP),
-    ("stage_D_muzzle", "stage_C_upper_face",
-     "Keeping everything already carved exactly as it is, now ALSO carve the "
-     "muzzle and both cheeks with fur cuts, leaving the dark green rind as "
-     "the nose and keeping the mouth CLOSED. MATCH THE FINISHED CARVING'S "
-     "RENDERING: dark green rind stays as the face's dark markings and the "
-     "pale carved rind is only the fur strokes and muzzle highlights — the "
-     "face must NOT become a solid pale shape. The outer ruff and the whole "
-     "decorative border still stay the flat dark line-art drawing on intact "
-     "dark green rind. More rind shavings have piled up below the melon. No "
-     "red flesh anywhere. " + KEEP),
+    # D is built BACKWARD from E, not forward from C. Measured 2026-07-29:
+    # the forward chain A->B->C->D accumulated design drift, so D's wolf was a
+    # DIFFERENT ANIMAL from master/E — soft painterly fur, narrow snout, no
+    # border, versus master's bold graphic style and wide flat nose. Any shot
+    # seeded from the old D cut against a shot seeded from E showed the wolf
+    # visibly change design mid-reel (the "second 7" defect). Removing the
+    # border from E is a SPATIAL regression (a region beside the subject), not
+    # the "un-carve the subject" regression that fails — so this one works.
+    ("stage_D_muzzle", "stage_E_closed_mouth",
+     "Remove ONLY the decorative leaf border that rings the {subject}: replace "
+     "it with flat thin dark line-art drawing on smooth intact dark green "
+     "rind, as if the border has not been carved yet. The {subject}'s FACE "
+     "must stay EXACTLY as it is — identical fur cuts, identical eyes, "
+     "identical nose, identical shape, same style, not redrawn. The mouth "
+     "stays closed and no red flesh appears. Rind shavings are scattered on "
+     "the surface below the melon. " + KEEP),
     # --- subtractive, from the master: the one easy backwards edit ---
     ("stage_E_closed_mouth", "master",
      "Close the {subject}'s mouth: replace the open red-flesh mouth with a "
@@ -182,6 +219,34 @@ def generate_master_gemini(prompt, dst, aspect="9:16",
     cl = gemini_client()
     r = cl.models.generate_content(
         model=model, contents=[prompt],
+        config=types.GenerateContentConfig(
+            image_config=types.ImageConfig(aspect_ratio=aspect)))
+    if not _save_first_image(r, dst):
+        sys.exit(f"ERROR: {model} returned no image: "
+                 f"{getattr(r, 'text', '')[:300]}")
+    return dst
+
+
+def generate_master_from_reference(prompt, reference, dst, aspect="9:16",
+                                   model="gemini-3-pro-image"):
+    """Text-to-image master CONDITIONED on a reference image (a logo, a
+    photo, a drawing) instead of a text description of the subject.
+
+    Combines the edit endpoint's image input with the aspect-ratio control
+    generate_master_gemini uses, since neither alone is enough: pure
+    text-to-image can't reproduce a specific logo's actual shape, and the
+    plain edit_with_gemini() below has no aspect control (fine for editing
+    an existing 9:16 rung, wrong for a fresh master that must match the
+    video job's aspect or Veo letterboxes it).
+    """
+    from google.genai import types
+    cl = gemini_client()
+    with open(reference, "rb") as f:
+        img = types.Part.from_bytes(data=f.read(), mime_type="image/png"
+                                     if reference.lower().endswith(".png")
+                                     else "image/jpeg")
+    r = cl.models.generate_content(
+        model=model, contents=[prompt, img],
         config=types.GenerateContentConfig(
             image_config=types.ImageConfig(aspect_ratio=aspect)))
     if not _save_first_image(r, dst):
@@ -257,6 +322,11 @@ def main():
     ap.add_argument("--subject", default="snarling gray wolf head")
     ap.add_argument("--master-gen", type=int, default=0, metavar="N",
                     help="Generate N master candidates and stop (curate by eye).")
+    ap.add_argument("--reference", default=None, metavar="PATH",
+                    help="Logo/photo/drawing to carve, instead of describing "
+                         "--subject in words. Used with --master-gen; "
+                         "requires --engine gemini (the only engine with an "
+                         "image-conditioned master path).")
     ap.add_argument("--master", default=None,
                     help="Path to the curated master still; builds the "
                          "regression rungs from it.")
@@ -285,9 +355,17 @@ def main():
     os.makedirs(seeds_dir, exist_ok=True)
 
     if args.master_gen:
-        prompt = MASTER_PROMPT.format(subject=args.subject)
+        if args.reference:
+            if not os.path.isfile(args.reference):
+                sys.exit(f"ERROR: --reference not found: {args.reference}")
+            if args.engine != "gemini":
+                sys.exit("ERROR: --reference needs --engine gemini")
+            prompt = REFERENCE_MASTER_PROMPT
+        else:
+            prompt = MASTER_PROMPT.format(subject=args.subject)
         if args.dry_run:
-            print(f"=== master x{args.master_gen}\n{prompt}")
+            src = f" <- {args.reference}" if args.reference else ""
+            print(f"=== master x{args.master_gen}{src}\n{prompt}")
             return
         import re
         taken = [int(m.group(1)) for f in os.listdir(seeds_dir)
@@ -295,7 +373,15 @@ def main():
         # max-index, not count: curation deletes takes, and counting would
         # renumber into a surviving keeper and overwrite it
         i = max(taken, default=0)
-        if args.engine == "gemini":
+        if args.reference:
+            for _ in range(args.master_gen):
+                i += 1
+                dst = os.path.join(seeds_dir, f"master_take{i}.png")
+                generate_master_from_reference(prompt, args.reference, dst,
+                                               aspect=args.aspect)
+                print(f"  [{args.aspect}] <- {os.path.basename(args.reference)}"
+                      f" -> {dst}")
+        elif args.engine == "gemini":
             for _ in range(args.master_gen):
                 i += 1
                 dst = os.path.join(seeds_dir, f"master_take{i}.png")

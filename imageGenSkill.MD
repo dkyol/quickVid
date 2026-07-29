@@ -659,7 +659,31 @@ you to check the Cloud Console rather than guessing a reset time.
 Seeds, crops and the forward-built ladder are all done and QC'd. Aspect is
 native 9:16 throughout, so no letterboxing.
 
-## The 10 generations, in priority order
+## The 10 generations, in priority order (REVISED 2026-07-29)
+
+**Do the cheap Gemini step FIRST — it is the enabler.** `stage_D_muzzle` must
+be rebuilt from `stage_E_closed_mouth` (border removed, face untouched) so it
+is on-design with the master. `make_ladder.py` is already edited to do this:
+
+```powershell
+& $PY make_ladder.py --project wolf_watermelon --subject "snarling gray wolf head" `
+    --master wolf_watermelon/seeds/master.png --only stage_D_muzzle
+& $PY make_ladder.py --master wolf_watermelon/seeds/master.png --crops-only `
+    --crop nose:stage_D_muzzle:0.28,0.42,0.44,0.22        # free, re-cut from new D
+```
+Audit the ladder (command above) before spending a single Veo generation.
+
+| # | shot | seed | takes | why |
+|---|---|---|---|---|
+| 1 | `07_ruff` | **new** `stage_D_muzzle` | 3 | restores the dropped shot, now on-design; its job is "the border appears" |
+| 2 | `06_nose_macro` | **new** `crop_nose` | 2 | current clip is seeded from the OLD painterly D and clashes with 08/09 |
+| 3 | `01_open` | `stage_A_outline` | 3 | converts the opening from the risky interp type to bounded i2v |
+| — | reserve | — | 2 | re-roll whatever QC rejects |
+
+`03_ears` stays as-is this round: it is an interpolation, but its carve is
+mid-stage so the face design is not legible enough to clash.
+
+## Old priority list (superseded — kept for reasoning)
 
 The goal is to eliminate the **three unintended in-shot cuts** by converting
 every remaining interpolation except the mouth into bounded i2v. Job:
@@ -680,6 +704,86 @@ every remaining interpolation except the mouth into bounded i2v. Job:
 Rank sorts by **drift** (distance from seed at the end) — validated as the
 metric that separates known-good from known-bad 2:1. Compare takes only
 within one shot; drift is not comparable across shots.
+
+## ⚠ THE LADDER CAN SPLIT INTO TWO DESIGN FAMILIES (root cause of "the wolf
+## changes design mid-reel")
+
+Found 2026-07-29 by auditing all six rungs side by side — do this audit
+before generating from ANY rung.
+
+The forward-built chain drifts. Each edit is faithful to *its own source*,
+but drift accumulates, so by the 4th link the wolf is a different animal
+from the master:
+
+| | A / B / C / D | E / master |
+|---|---|---|
+| built by | forward chain from A | single regression from master |
+| fur | soft, painterly, feathered | bold graphic, hard-edged |
+| snout | narrow | wide, flat |
+| border | none | ornate leaf border |
+
+Any shot seeded from the first family, cut against a shot seeded from the
+second, shows the carving visibly become a **different wolf**. That was the
+"second 7" defect, and it is a SEED bug — regenerating the shot from the same
+rung reproduces it exactly and wastes the generations.
+
+**Fix:** build the late rungs BACKWARD from the master. Removing the border
+from E to make D is a *spatial* regression (a region beside the subject), and
+those work — unlike the "un-carve the subject" regression documented above,
+which does not. Keep every rung within one edit of the master where possible.
+
+**Audit command (free) — run before every generation batch:**
+```powershell
+cd <proj>/seeds
+../../tools/ffmpeg.exe -y -i stage_A_outline.png -i stage_B_first_cuts.png `
+  -i stage_C_upper_face.png -i stage_D_muzzle.png -i stage_E_closed_mouth.png `
+  -i master.png -filter_complex "[0]scale=250:444[a];[1]scale=250:444[b];`
+  [2]scale=250:444[c];[3]scale=250:444[d];[4]scale=250:444[e];`
+  [5]scale=250:444[f];[a][b][c][d][e][f]hstack=6" -frames:v 1 audit.png
+```
+Look for: same fur style, same snout width, same eye treatment across all
+six. Monotonic carve coverage is NOT sufficient — v6's ladder was monotonic
+and still split into two families.
+
+## ⚠ CORRECTED 2026-07-29: the "ephemeral token" theory below was wrong
+
+A key starting **`AQ.`** DOES work as a real `GOOGLE_API_KEY` — verified live
+(`GET /v1beta/models?key=$K` → 200 with a real model list). The 401
+`ACCESS_TOKEN_TYPE_UNSUPPORTED` seen below was caused by a **stray trailing
+character appended to the value in `.env`** (53 chars was valid, 54 was not)
+— almost certainly a copy-paste artifact, not a token-type problem. Diagnose
+a bad key by diffing the exact string against a known-good paste, not by its
+prefix or length pattern. The original (wrong) theory is kept below because
+the diagnostic call is still the right first move — just don't trust a
+prefix-based verdict over a byte-for-byte comparison.
+
+A **monthly spending cap** produces a different, unambiguous 429 — distinct
+from the two ambiguous types in the Veo section below:
+```
+429 RESOURCE_EXHAUSTED
+"Your project has exceeded its monthly spending cap. Please go to AI Studio
+at https://ai.studio/spend to manage your project spend cap."
+```
+This one names its own cause and fix; raise the cap at that URL. It can
+coexist with a **2 requests/minute rate limit** that trips independently —
+if a call fails right after raising the cap, wait and retry once rather than
+assuming the cap increase didn't take.
+
+### Original (partially wrong) theory, kept for the diagnostic call
+
+A key starting **`AQ.`** (~54 chars) is an *ephemeral* AI Studio token. It
+works for a while, then every call — including free ones like `models.list`
+— returns:
+
+```
+401 UNAUTHENTICATED  reason: ACCESS_TOKEN_TYPE_UNSUPPORTED
+"Expected OAuth 2 access token, login cookie or other valid credential"
+```
+
+That is NOT quota and NOT billing. A real key starts **`AIza`** and is 39
+chars; make one at https://aistudio.google.com/apikey. Diagnose in one free
+call: `curl "https://generativelanguage.googleapis.com/v1beta/models?key=$K"`
+— 401 means auth, 429 means quota/billing.
 
 ## Port these from the Grok/hybrid reel (measured 2026-07-29)
 
@@ -736,6 +840,59 @@ saturation ports recover most of the visible gap for free.
 - [ ] full 1080x1920 frame, no letterbox
 - [ ] not fully carved before the final third; no cloth wipe
 - [ ] cut discontinuity <= reference; rhythm varied with one flash cut
+
+# v8 EXECUTED (2026-07-29) — full-clip scrubbing is mandatory, not optional
+
+Ran the V8 runbook's 3-shot plan (07_ruff, 06_nose_macro, 01_open) + the
+missing 03_ears (never generated before, blocking the stitch). 9/9 shots now
+have promoted Veo clips. Two new failure modes found, neither visible from a
+2-frame spot check:
+
+**1. Bounded i2v shots can still drift into an unbounded reveal LATE in
+their 8s, after looking clean early.** Three separate clips — `01_open`,
+`03_ears`, `06_nose_macro`, all plain i2v with prompts that explicitly ask
+for one small bounded cut — ran clean through 4-5s, then between roughly
+5.5s and 6.5s spontaneously opened the mouth to full red flesh, i.e.
+finished the ENTIRE carve unprompted. `01_open`'s worst take was fully
+carved with an open red mouth by 6s despite a prompt asking for "two short
+careful scoring cuts" and nothing else. **QC by spot-checking one or two
+timestamps missed this every time** — a check at exactly 3s and 5s on
+`01_open`'s bad take looked fine; only a full 1fps scrub of all 8 seconds
+caught it. **New rule: scrub every promoted clip at 1fps (8 frames) before
+trusting it, not 2 hand-picked timestamps.**
+
+**2. The `drift` ranking metric picked the WRONG take on `01_open`.** Ranked
+best-first by lowest drift: take2 (14.7), take1 (17.6), take3 (20.7).
+Take2 — the "best" one — was the take that blew up into a full reveal by
+6s; take1 and take3 both stayed correctly bounded the entire 8s. `drift`
+(distance from seed at the end) is apparently computed over a window that
+doesn't reliably catch a late-clip runaway. **Treat `--rank` as a shortlist
+tool, not a verdict — always eyeball the actual full clip of the top pick
+before promoting, especially for plain i2v shots with a tight bound.**
+
+**3. Border texture is inconsistent across the ladder, independent of the
+D-rebuild fix.** `stage_B_first_cuts`/`stage_C_upper_face` (used by
+`03_ears`, `05_midface`) show a dark TEXTURED/etched border; the rebuilt
+`stage_D_muzzle` (used by `07_ruff`) shows a completely FLAT/smooth border;
+`stage_E_closed_mouth`/`master` (used by `08_mouth`) show a fully carved
+BOLD PALE leaf border. Cut together, the border visibly regresses then
+jumps between three different states. This predates the 2026-07-29 D
+rebuild — B/C were never touched — so it is a separate, still-open ladder
+defect. Not fixed this round (would need re-editing B/C and regenerating
+`03_ears`/`05_midface` on Veo — real additional spend); shipped as-is by
+user decision. Fix next time by rebuilding B/C backward from D/E the same
+way D was rebuilt from E, so the whole ladder shares one border state until
+the shot whose actual job is "the border appears."
+
+**Recut, not even slots:** the free assembly step matters as much as the
+docs claim. Even-slot stitching scored cut-mean 22.4 with a max spike of
+82.8 (worse than the reference's 44.2, from an uncorrected wide→macro
+transition with no content match). Re-trimming two shots to end on
+more-pale-exposed frames — same technique as the historical "start shot 1
+later" fix — dropped the worst spike from 83 to 6 and the overall cut mean
+to 15.2 (gentler than the reference's 29.2), for zero additional
+generations. Script: `scratchpad/recut_v8.py`. Output:
+`wolf_watermelon/final/v8_recut.mp4`.
 
 # v8 (2026-07-28) — DON'T ASK VEO TO TRANSFORM
 
