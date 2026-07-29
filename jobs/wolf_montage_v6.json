@@ -1,0 +1,94 @@
+{
+  "project": "wolf_watermelon",
+  "aspect_ratio": "9:16",
+  "resolution": "1080p",
+  "crossfade": 0,
+  "_path": "VEO 3.1. Generate:  python veo_carve.py --job jobs/wolf_montage_v6.json   Stitch:  python montage_carve.py --job jobs/wolf_montage_v6.json --stitch-only --from-prefix veo_",
+  "_fixes": "v6 vs v5: (1) master + all rungs regenerated NATIVE 9:16 on gemini-3-pro-image - v5's Grok-derived 3:4 seeds made Veo letterbox every clip (1080x1440 of content inside a 1080x1920 frame, a quarter of the frame lost); (2) rungs C and D re-rolled with a MATCH clause so the face keeps the master's two-tone dark-rind-plus-pale-fur rendering instead of drifting to solid pale; (3) ALL trim windows are EARLY (1.0-3.9s) - measured on v5, Veo improvises forward and hard-snaps to the pinned end frame in the final frames, so tail trims contain a visible jump cut while the start frame is always exact; (4) 9 shots instead of 8, adding a nose macro so every wide transition is followed by a macro beat.",
+  "_rhythm": "9 cuts / 12.6s (reference: 8 cuts / 11.4s). Wide transition then macro, alternating, with the mouth excavation given the longest slot.",
+  "style_suffix": "Shallow bas-relief carved INTO the curved watermelon rind, traditional Thai fruit carving. The carving is a watermelon, not a living animal: it never moves, blinks or breathes; only the knife, the hand and falling shavings move. Only watermelon colors - dark green rind, pale green-white inner rind, red flesh solely inside the mouth. Soft flat diffused daylight, plain pale grey background, matte natural texture. Handheld macro, shallow focus, photorealistic. Crisp knife-on-rind cutting sounds, no music, no voices.",
+  "negative_prompt": "two knives, second knife, duplicate blade, extra hand, mirrored hands, cartoon, illustration, painting, airbrush, glowing, neon, living animal, moving eyes, blinking, breathing, grey fur, black markings, text, watermark, subtitles, music, letterbox, black bars",
+  "shots": [
+    {
+      "name": "01_first_cuts",
+      "scale": "wide",
+      "seed": "stage_A_outline",
+      "seed_end": "stage_B_first_cuts",
+      "slot": 1.6,
+      "trim": 1.2,
+      "prompt": "A hand holds a small paring knife and makes the very first cuts of a long carving into the wolf's EARS and the top of its skull, following the faint drawn lines: the blade bites in, pale inner rind opens up behind it, curls of dark green rind lift off and drop away. Only two or three slow deliberate cuts happen in the whole shot. Everything below the ears stays a faint drawing on smooth intact dark green rind, the mouth is NEVER cut open, and NO red flesh appears at any point."
+    },
+    {
+      "name": "02_ear_macro",
+      "scale": "macro",
+      "seed": "crop_ear",
+      "slot": 0.9,
+      "trim": 1.5,
+      "prompt": "Extreme macro on the boundary where the freshly carved pale rind meets the untouched drawing below it. The knife tip makes one short deep cut along that edge and a single pale shaving curls off the blade and falls away."
+    },
+    {
+      "name": "03_upper_face",
+      "scale": "wide",
+      "seed": "stage_B_first_cuts",
+      "seed_end": "stage_C_upper_face",
+      "slot": 1.6,
+      "trim": 1.6,
+      "_trim_note": "standard-Veo take: single knife throughout; 1.6s is where the blade is working the cut edge with shavings coming off",
+      "prompt": "The knife works down from the carved ears across the brow and around both eyes, cutting fur strokes and opening the eyes out of the rind; strips of dark green rind peel off and fall. A clean cut edge is left across the middle of the face - below it the muzzle and mouth are still only a faint drawing. The dark green rind stays as the face's dark markings; the pale rind is only the fur detail. NO red flesh."
+    },
+    {
+      "name": "04_eye_macro",
+      "scale": "macro",
+      "seed": "crop_eye",
+      "slot": 0.9,
+      "trim": 3.6,
+      "_trim_note": "i2v shot has no end frame to snap to, so a late window is safe here; 3.6s is where the pale shaving curls off the blade",
+      "prompt": "Extreme macro on the carved eye. ONE single knife held in ONE single hand enters from the left, its tip tracing the eye's edge once to deepen the socket, and a thin sliver of pale rind curls off and drops away. There is only ONE blade and ONE hand in the entire shot - no second knife, no second hand, nothing enters from the right. The drawn, uncarved area below the cut edge does not change."
+    },
+    {
+      "name": "05_muzzle",
+      "scale": "wide",
+      "seed": "stage_C_upper_face",
+      "seed_end": "stage_D_muzzle",
+      "slot": 1.6,
+      "trim": 1.5,
+      "_trim_note": "peak shaving fall; the muzzle is visibly converting from drawing to relief through this window",
+      "prompt": "The knife carves down over the muzzle and both cheeks, converting the drawn lower face into fur relief cut by cut and leaving the dark green rind as the nose. Shavings pile up below the melon. The mouth stays closed and NO red flesh appears."
+    },
+    {
+      "name": "06_nose_macro",
+      "scale": "macro",
+      "seed": "crop_nose",
+      "slot": 0.9,
+      "trim": 1.8,
+      "prompt": "Macro on the carved wolf's muzzle and nose, the whole muzzle visible in frame. ONE single knife held in ONE hand makes two short clean fur cuts into the pale rind beside the nose - each cut is a crisp incision that lifts a thin firm shaving which curls and falls away cleanly. The blade never smears, mashes or drags a soft lump; every stroke is a clean cut with a sharp edge. The nose keeps its dark green rind surface and the carving does not otherwise change."
+    },
+    {
+      "name": "07_border",
+      "scale": "wide",
+      "seed": "stage_D_muzzle",
+      "seed_end": "stage_E_closed_mouth",
+      "slot": 1.4,
+      "trim": 3.0,
+      "_trim_note": "border only starts appearing around 2.7s; this window is where it visibly spreads",
+      "prompt": "The knife moves out past the wolf's face and carves the decorative leaf border ringing it, dark green rind lifting away in long curls to leave pale carved leaves. The wolf's face itself does not change and the mouth stays closed."
+    },
+    {
+      "name": "08_mouth",
+      "scale": "macro",
+      "seed": "stage_E_closed_mouth",
+      "seed_end": "master",
+      "slot": 2.4,
+      "trim": 1.5,
+      "prompt": "The blade digs into the wolf's closed mouth and opens the jaw, levering out chunks and strands of vivid red juicy flesh until the red interior of the snarling mouth is revealed behind pale carved fangs. Red pulp and shavings drop away and juice beads on the blade. Wet cutting sounds."
+    },
+    {
+      "name": "09_hero",
+      "scale": "wide",
+      "seed": "master",
+      "slot": 1.3,
+      "trim": 0.5,
+      "prompt": "The finished carving rests in the hands, turning just a few degrees so the light moves across the relief. Nothing is cut and nothing is wiped - it simply holds for the reveal."
+    }
+  ]
+}

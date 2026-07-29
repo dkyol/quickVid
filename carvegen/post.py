@@ -89,6 +89,11 @@ def _xfade_chain(n, durs, cf):
 def _acrossfade_chain(n, cf):
     if n == 1:
         return None, "0:a"
+    if cf <= 0:
+        # acrossfade=d=0 falls back to ffmpeg's 1s default and eats (n-1)s of
+        # audio; hard cuts must concat (same fix as build_reel.py)
+        streams = "".join(f"[{i}:a]" for i in range(n))
+        return f"{streams}concat=n={n}:v=0:a=1[aout]", "aout"
     parts, prev = [], "[0:a]"
     for i in range(1, n):
         out = f"a{i}" if i < n - 1 else "aout"

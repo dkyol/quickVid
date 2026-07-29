@@ -140,7 +140,8 @@ def main():
         "crossfade": 0.3,
         "width": 1080, "height": 1920, "fps": 30,
         "image_model": "grok-imagine-image",
-        "video_model": "grok-imagine-video",
+        "video_model": "grok-imagine-video-1.5",
+        "resolution": "1080p",
         "aspect_ratio": args.aspect_ratio,
         "shots": shots,
     }

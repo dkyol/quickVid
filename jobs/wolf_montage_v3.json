@@ -1,0 +1,81 @@
+{
+  "project": "wolf_watermelon",
+  "video_model": "grok-imagine-video-1.5",
+  "resolution": "1080p",
+  "aspect_ratio": "9:16",
+  "gen_duration": 5,
+  "crossfade": 0,
+  "_rhythm": "slots copied from the @carve__reveal reference cut list (8 cuts / 11.4s)",
+  "_note": "v3 HYBRID (2026-07-27): shots 01/02/05/06 are Hailuo (minimax variant) start/end-frame transitions between adjacent ladder rungs, generated via the Higgsfield MCP, center-cropped 3:4 -> 9:16, and placed at media/m_<name>.mp4 by hand (montage_carve skips existing clips). Hailuo beat Seedance mini (720p) and bounded Grok i2v on the D->master A/B: 1080p, hand on knife, blade works inside the mouth. Shots 03/04/07/08 are Grok 1080p single-seed from crops of master.png. trim='tail' on transitions so each cut lands on its end rung - the next shot's seed.",
+  "style_suffix": "The wolf is a carved watermelon SCULPTURE, not a living animal: the carving never moves, blinks or breathes; only the knife and the hand gripping it move. Rendered entirely in the melon's own layers - dark green rind markings, pale cream-white carved rind fur, red flesh only where already visible. Soft flat diffused light, matte natural texture, no glow, no airbrush. Subtle handheld micro-movement, shallow focus. Photorealistic, ultra-detailed. No text, no watermark.",
+  "shots": [
+    {
+      "name": "01_wide_outline",
+      "scale": "wide",
+      "seed": "stage_A_outline",
+      "slot": 1.6,
+      "trim": "tail",
+      "provider": "hailuo start/end A->B (clip placed by hand)",
+      "prompt": "PLACEHOLDER - Hailuo transition stage_A_outline -> stage_B_first_score."
+    },
+    {
+      "name": "02_first_score",
+      "scale": "medium",
+      "seed": "stage_B_first_score",
+      "slot": 0.9,
+      "trim": "tail",
+      "provider": "hailuo start/end B->C (clip placed by hand)",
+      "prompt": "PLACEHOLDER - Hailuo transition stage_B_first_score -> stage_C_half_carved."
+    },
+    {
+      "name": "03_brow",
+      "scale": "macro",
+      "seed": "crop_brow",
+      "slot": 0.9,
+      "trim": 1.0,
+      "prompt": "The knife tip touches the pale carved rind above the eyes and makes one short deep fur stroke - a small pale shaving curls off the blade and falls. Brief contact, then the blade lifts away."
+    },
+    {
+      "name": "04_eyes",
+      "scale": "macro",
+      "seed": "crop_eyes",
+      "slot": 1.8,
+      "trim": 1.0,
+      "prompt": "The knife tip cuts once around the eye, deepening the socket - a strip of pale rind lifts on the blade, curls, and falls away, small chips scattering. Brief contact moments, the blade entering and lifting."
+    },
+    {
+      "name": "05_half",
+      "scale": "medium",
+      "seed": "stage_C_half_carved",
+      "slot": 1.8,
+      "trim": "tail",
+      "provider": "hailuo start/end C->D (clip placed by hand)",
+      "prompt": "PLACEHOLDER - Hailuo transition stage_C_half_carved -> stage_D_no_flesh."
+    },
+    {
+      "name": "06_mouth",
+      "scale": "macro",
+      "seed": "stage_D_no_flesh",
+      "slot": 1.7,
+      "trim": "tail",
+      "provider": "hailuo start/end D->master (clip placed by hand, A/B winner)",
+      "prompt": "PLACEHOLDER - Hailuo transition stage_D_no_flesh -> master (mouth excavation)."
+    },
+    {
+      "name": "07_fangs",
+      "scale": "macro",
+      "seed": "crop_mouth",
+      "slot": 1.3,
+      "trim": 1.0,
+      "prompt": "The knife tip cleans the edge of one carved fang with a single short stroke - a fine sliver curls off and drops, juice glistening on the blade and on the red flesh inside the mouth. Brief contact, then the blade lifts."
+    },
+    {
+      "name": "08_hero",
+      "scale": "wide",
+      "seed": "master",
+      "slot": 1.4,
+      "trim": 1.0,
+      "prompt": "A cloth wipes once across the finished carving, clearing shavings, and the hands turn the melon a few degrees to settle it centered for the hero reveal. The carving itself does not change."
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "project": "wolf_reel",
+  "crossfade": 0.3,
+  "width": 1080,
+  "height": 1920,
+  "fps": 30,
+  "image_model": "grok-imagine-image",
+  "video_model": "grok-imagine-video",
+  "aspect_ratio": "9:16",
+  "shots": [
+    {
+      "name": "01_seg",
+      "type": "image_to_video",
+      "seed": "seed_01.png",
+      "duration": 4,
+      "seconds": 4.0,
+      "prompt": "DESCRIBE the carving motion for this segment (what the knife reveals between this seed and the next)."
+    },
+    {
+      "name": "02_seg",
+      "type": "image_to_video",
+      "seed": "seed_02.png",
+      "duration": 4,
+      "seconds": 4.0,
+      "prompt": "DESCRIBE the carving motion for this segment (what the knife reveals between this seed and the next)."
+    },
+    {
+      "name": "03_seg",
+      "type": "image_to_video",
+      "seed": "seed_03.png",
+      "duration": 3,
+      "seconds": 3.41,
+      "prompt": "DESCRIBE the carving motion for this segment (what the knife reveals between this seed and the next)."
+    }
+  ]
+}

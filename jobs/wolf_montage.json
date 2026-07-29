@@ -1,0 +1,68 @@
+{
+  "project": "wolf_watermelon",
+  "video_model": "grok-imagine-video-1.5",
+  "resolution": "1080p",
+  "aspect_ratio": "9:16",
+  "gen_duration": 5,
+  "crossfade": 0,
+  "_rhythm": "slots copied from the reference cut list (11.4s total)",
+  "style_suffix": "Soft flat diffused daylight, no hard shadows. The wolf is carved ENTIRELY from the melon's own layers: dark green rind for the nose and dark markings, pale cream-white carved rind as the fur, each tuft a separate knife cut with its own cast shadow. Matte natural texture, no glow, no airbrush. Subtle handheld micro-movement, shallow focus. Photorealistic, ultra-detailed. Nothing else in the frame changes.",
+  "shots": [
+    {
+      "name": "01_wide_open",
+      "scale": "wide",
+      "seed": "ladder_01_wide_outline",
+      "slot": 1.6,
+      "prompt": "The hands holding the carved watermelon turn it very slightly toward the camera and steady it; a knife tip touches the rind at the edge of the carving."
+    },
+    {
+      "name": "02_brow",
+      "scale": "macro",
+      "seed": "ladder_crop_brow",
+      "slot": 0.9,
+      "prompt": "A knife tip etches two or three short fur lines into the pale carved rind above the eye; a sliver of rind lifts away."
+    },
+    {
+      "name": "03_eyes",
+      "scale": "macro",
+      "seed": "ladder_crop_eyes",
+      "slot": 0.9,
+      "prompt": "A knife tip traces the carved edge beside the eye, deepening one cut; a tiny pale shaving curls off and falls."
+    },
+    {
+      "name": "04_fur",
+      "scale": "macro",
+      "seed": "ladder_crop_fur",
+      "slot": 1.8,
+      "prompt": "The blade shaves along the fur tufts and several thin pale shavings curl off the knife and fall away out of frame."
+    },
+    {
+      "name": "05_mouth",
+      "scale": "macro",
+      "seed": "ladder_06_macro_mouth",
+      "slot": 1.8,
+      "prompt": "The knife tip works at the lip beside a carved fang; the red flesh inside the open mouth glistens wet. The mouth stays exactly the same shape."
+    },
+    {
+      "name": "06_fangs",
+      "scale": "macro",
+      "seed": "ladder_crop_mouth",
+      "slot": 1.7,
+      "prompt": "A knife tip cleans the edge of one carved fang and a small crumb of rind drops away; juice glistens on the blade."
+    },
+    {
+      "name": "07_wipe",
+      "scale": "medium",
+      "seed": "ladder_07_medium_finished",
+      "slot": 1.3,
+      "prompt": "The cloth in the hand wipes once across the carved surface, leaving it clean and glossy, then lifts away."
+    },
+    {
+      "name": "08_hero",
+      "scale": "wide",
+      "seed": "ladder_08_wide_hero",
+      "slot": 1.4,
+      "prompt": "The finished carved watermelon rests still, rotating a few degrees very slowly on the plain surface for the final reveal."
+    }
+  ]
+}

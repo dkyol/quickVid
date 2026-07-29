@@ -1,0 +1,16 @@
+{
+  "project": "wolf_watermelon",
+  "aspect_ratio": "9:16",
+  "resolution": "1080p",
+  "_note": "A/B probe: same D->master mouth-excavation pair Hailuo won on 2026-07-27, now through Veo 3.1 first+last frame. Direct comparison against media/v4_hailuo_06_DtoM_t2.mp4.",
+  "style_suffix": "Shallow bas-relief carving into the curved watermelon rind, like traditional Thai fruit carving - nothing protrudes beyond the melon's surface. It is a carved watermelon, not a living animal: the carving never moves, blinks or breathes; only the knife and the hand holding it move. Only watermelon colors in frame - dark green rind, pale green-white inner rind, red flesh only inside the mouth; no grey, no black. Soft flat diffused light, matte natural texture, subtle handheld micro-movement, shallow focus, photorealistic macro. No text, no watermark.",
+  "negative_prompt": "cartoon, illustration, painting, glowing, neon, living animal, moving eyes, blinking, breathing, text, watermark, subtitles",
+  "shots": [
+    {
+      "name": "ab_mouth",
+      "seed": "stage_D_no_flesh",
+      "seed_end": "master",
+      "prompt": "Macro process video of a watermelon carving. The hand works the paring knife into the carved wolf's closed mouth line, opening the jaw: the blade digs in, levers out chunks and strands of vivid red juicy flesh, and the red interior of the snarling mouth is revealed with pale carved fangs. Pulp and pale shavings drop away, juice beads on the blade. Crisp knife-on-rind sounds, wet cutting, no music, no voices."
+    }
+  ]
+}

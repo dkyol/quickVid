@@ -1,0 +1,54 @@
+{
+  "project": "wolf_watermelon",
+  "subject": "snarling gray wolf head",
+  "material": "watermelon",
+  "seed_start": "seed_start_grok",
+  "video_model": "grok-imagine-video-1.5",
+  "resolution": "1080p",
+  "aspect_ratio": "9:16",
+  "gen_duration": 5,
+  "crossfade": 0,
+  "_rhythm": "slots copied from the @carve__reveal reference cut list (8 cuts / 11.4s)",
+  "stages": [
+    {
+      "name": "01_first_score",
+      "slot": 1.6,
+      "delta": "The knife makes its first shallow score along the drawn outline of the ears and skull; one thin curl of green rind lifts and falls away. Everything else is still flat black drawing on intact green rind."
+    },
+    {
+      "name": "02_outline_cut",
+      "slot": 0.9,
+      "delta": "The score is deepened all around the head outline, pale white rind now showing as a thin bright edge following the drawn line, a few green curls dropping."
+    },
+    {
+      "name": "03_ears_skull",
+      "slot": 0.9,
+      "delta": "Green rind is shaved away from inside the ears and across the top of the skull, exposing broad pale areas that begin to read as the wolf's forehead and ear shapes."
+    },
+    {
+      "name": "04_brow_eyes",
+      "slot": 1.8,
+      "delta": "The brow ridge and eye sockets are cut deeper, the eyes taking shape as rounded relief with the dark green rind left as the pupils."
+    },
+    {
+      "name": "05_muzzle",
+      "slot": 1.8,
+      "delta": "The muzzle and snout are carved into raised three-dimensional relief, the dark green rind kept as the nose, fur tufts etched in fine lines across the cheeks."
+    },
+    {
+      "name": "06_mouth_flesh",
+      "slot": 1.7,
+      "delta": "The blade cuts through into the mouth, opening it to expose vivid red juicy flesh as the snarling mouth and tongue, with pale carved fangs standing out against the red."
+    },
+    {
+      "name": "07_fur_detail",
+      "slot": 1.3,
+      "delta": "Fast fine detail passes: dozens of short fur strokes etched around the ruff and cheeks, thin shavings flicking away and piling up below the melon."
+    },
+    {
+      "name": "08_hero_reveal",
+      "slot": 1.4,
+      "delta": "A cloth wipes the carving clean and the hands turn the melon slightly to settle it centered for the reveal."
+    }
+  ]
+}

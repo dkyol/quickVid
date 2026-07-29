@@ -188,6 +188,12 @@ def build_acrossfade_chain(n, crossfade):
     (filter_complex string or None, output label)."""
     if n == 1:
         return None, "0:a"
+    if crossfade <= 0:
+        # acrossfade=d=0 is treated by ffmpeg as UNSET and falls back to its
+        # 1s default, eating (n-1) seconds of audio — a hard-cut reel must
+        # concat instead (measured: 8-shot reel lost ~7s, foley drifted ahead)
+        streams = "".join(f"[{i}:a]" for i in range(n))
+        return f"{streams}concat=n={n}:v=0:a=1[aout]", "aout"
     filters = []
     prev_label = "[0:a]"
     for i in range(1, n):

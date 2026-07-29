@@ -1,0 +1,25 @@
+{
+  "project": "wolf_reel",
+  "crossfade": 0.3,
+  "width": 1080,
+  "height": 1920,
+  "fps": 30,
+  "image_model": "grok-imagine-image",
+  "video_model": "grok-imagine-video",
+  "aspect_ratio": "9:16",
+  "shots": [
+    {
+      "name": "00_seed",
+      "type": "image",
+      "prompt": "Extreme close-up vertical phone photo. Two hands hold a whole vivid green watermelon with dark green stripes. A complete wolf head design has been drawn onto the green rind in fine black outline ink — muzzle, snout, eyes and two pointed ears all outlined. The two ears have just been carved into shallow relief, exposing the pale whitish-green rind layer with fine fur-texture strokes; the rest of the wolf face is still only the black ink outline on the smooth green rind, not yet carved. A small paring knife is mid-carve near one ear. Detailed fruit-carving art style, warm natural light, dark wooden table background. This is a green watermelon carving, not a realistic grey wolf, not painted."
+    },
+    {
+      "name": "01_carve",
+      "type": "image_to_video",
+      "seed": "00_seed",
+      "duration": 15,
+      "seconds": 15,
+      "prompt": "Time-lapse macro of the same watermelon being carved into a wolf head, progressing feature by feature. The knife carves down through the green rind into the pale whitish-green layer and each stroke directly cuts fur texture that follows the drawn outline: first the ears finish, then the eyes are carved with fine detail, then the cheeks and forehead fill in with engraved fur strokes, the melon's green striations left as natural fur shading and the dark green rind left as the nose, eye outlines and dark markings. Finally the knife opens the muzzle and cuts into the core to expose bright red watermelon flesh as the open snarling mouth, tongue and inner ears, with pale carved rind fangs. Ends on the finished wolf head and a hand brushing away peel shavings. Entirely green, white and red watermelon material with fine dark outline detail — a carved watermelon, NOT realistic grey fur, not painted, no grey. Continuous single take, realistic knife-carving physics, warm natural light, dark wooden background."
+    }
+  ]
+}

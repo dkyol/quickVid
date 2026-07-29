@@ -1,0 +1,78 @@
+{
+  "project": "wolf_watermelon",
+  "aspect_ratio": "9:16",
+  "resolution": "1080p",
+  "crossfade": 0,
+  "_thesis": "v8: STOP ASKING VEO TO TRANSFORM. Every bad moment in v6/v7 was an interpolation shot covering a LARGE change - it removed half the face in one sweep (sec 4), or redesigned the wolf mid-clip (sec 8), or raced past its stage with two knives. The macros, which only ever ask for one small bounded action, never failed. The ladder rungs A->B->C->D->E->master already encode the whole carve, so progression is carried by the SEEDS and the CUTS, not by within-shot transformation - which is what the reference does ('most removal is implied across a cut'). Interpolation survives ONLY on the mouth, where the change is small, local, and was the one interp shot that consistently worked.",
+  "_takes": "Focused plan: 3 takes on the progression wides + mouth, 2 on macros, 1 on hero (~22 generations, standard Veo caps near 11/day so this spans 2 days). Rank with: veo_carve.py --job jobs/wolf_montage_v8.json --rank   Sort is by DRIFT (distance from seed at the end) - validated 2026-07-28 as the metric that separates the known-bad clips 2:1, where 'step' did not discriminate at all.",
+  "_assembly": "Do NOT stitch with even slots. Use scratchpad/recut.py: punch in on wides (z 1.05-1.30), match content across cuts, one 0.35-0.45s flash, varied rhythm. It prints our cut-jump and in-shot figures beside the reference's.",
+  "style_suffix": "Shallow bas-relief carved INTO the curved watermelon rind, traditional Thai fruit carving. The carving is a watermelon, not a living animal: it never moves, blinks or breathes; only the knife, the hand and falling shavings move. ONE knife in ONE hand - no second blade, no second hand. Only watermelon colors - dark green rind, pale green-white inner rind, red flesh solely inside the mouth. Soft flat diffused daylight, plain pale grey background, matte natural texture. Handheld macro, shallow focus, photorealistic. Crisp knife-on-rind cutting sounds, no music, no voices.",
+  "negative_prompt": "two knives, second knife, duplicate blade, extra hand, mirrored hands, large area removed at once, whole sheet of rind peeling, redesigned pattern, different carving, cartoon, illustration, painting, airbrush, glowing, neon, living animal, moving eyes, blinking, breathing, grey fur, black markings, text, watermark, subtitles, music, letterbox, black bars",
+  "shots": [
+    {
+      "name": "01_open",
+      "scale": "wide",
+      "seed": "stage_A_outline",
+      "takes": 3,
+      "prompt": "The hand brings the paring knife to the drawn line at the top of the wolf's ear and makes TWO short careful scoring cuts, each lifting a thin curl of dark green rind that falls away. Nothing else on the melon changes: the whole design stays a faint drawing on smooth intact rind, and by the end only those two small score marks exist. No red flesh anywhere."
+    },
+    {
+      "name": "02_ear_macro",
+      "scale": "macro",
+      "seed": "crop_ear",
+      "takes": 2,
+      "prompt": "Extreme macro at the boundary where freshly carved pale rind meets the untouched drawing. The knife tip makes ONE short deep cut along that edge and a single pale shaving curls off the blade and falls. The blade then lifts away. Nothing else changes."
+    },
+    {
+      "name": "03_ears",
+      "scale": "wide",
+      "seed": "stage_B_first_cuts",
+      "takes": 3,
+      "prompt": "The hand works the knife along the already-carved ear edges, deepening them with THREE short strokes; small chips and thin curls of rind flick away and drop. The carving advances only slightly - the muzzle and the border stay exactly the flat drawing they are now. No red flesh anywhere."
+    },
+    {
+      "name": "04_eye_macro",
+      "scale": "macro",
+      "seed": "crop_eye",
+      "takes": 2,
+      "prompt": "Extreme macro on the carved eye. ONE knife in ONE hand traces the eye's edge once to deepen the socket, and a thin sliver of pale rind curls off and drops away. The drawn, uncarved area below the cut edge does not change."
+    },
+    {
+      "name": "05_midface",
+      "scale": "wide",
+      "seed": "stage_C_upper_face",
+      "takes": 3,
+      "prompt": "The knife works along the clean cut edge across the middle of the wolf's face, shaving small chips from the boundary so a little more pale rind is exposed just below it. Slow deliberate strokes, shavings collecting below the melon. The lower face and the border stay the flat drawing they are now - NO large area is removed and no sheet of rind peels off. No red flesh anywhere."
+    },
+    {
+      "name": "06_nose_macro",
+      "scale": "macro",
+      "seed": "crop_nose",
+      "takes": 2,
+      "prompt": "Macro on the carved wolf's muzzle and nose, the whole muzzle visible. ONE knife in ONE hand makes two short clean fur cuts into the pale rind beside the nose - each a crisp incision lifting a thin firm shaving that curls and falls cleanly. The blade never smears or drags a soft lump. The nose keeps its dark green rind surface."
+    },
+    {
+      "name": "07_ruff",
+      "scale": "wide",
+      "seed": "stage_D_muzzle",
+      "takes": 3,
+      "prompt": "The knife cuts a few short strokes into the outer ruff at the edge of the carved face, throwing small chips, then lifts away. The wolf's face and its pattern stay EXACTLY as they are - the design is never redrawn or changed, only a few small cuts are added at the edge. The mouth stays closed and no red flesh appears."
+    },
+    {
+      "name": "08_mouth",
+      "scale": "wide",
+      "seed": "stage_E_closed_mouth",
+      "seed_end": "master",
+      "takes": 3,
+      "_why_interp": "the one transformation worth interpolating: small, local, and the only interp shot that worked reliably in v6/v7",
+      "prompt": "The blade digs into the wolf's closed mouth and opens the jaw, levering out chunks and strands of vivid red juicy flesh until the red interior of the snarling mouth is revealed behind pale carved fangs. Red pulp and shavings drop away and juice beads on the blade. Everything else on the melon stays exactly as it is. Wet cutting sounds."
+    },
+    {
+      "name": "09_hero",
+      "scale": "wide",
+      "seed": "master",
+      "takes": 1,
+      "prompt": "The finished carving rests in the hands, turning just a few degrees so the light moves across the relief. Nothing is cut and nothing is wiped - it simply holds for the reveal."
+    }
+  ]
+}

@@ -48,6 +48,7 @@ except Exception:
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 IMAGES_URL = "https://api.x.ai/v1/images/generations"
+EDITS_URL = "https://api.x.ai/v1/images/edits"
 VIDEOS_URL = "https://api.x.ai/v1/videos/generations"
 VIDEO_STATUS_URL = "https://api.x.ai/v1/videos/{request_id}"
 
@@ -116,6 +117,28 @@ def generate_image(prompt, model, n=1):
     if not data:
         sys.exit(f"ERROR: no images returned: {r.text[:800]}")
     return data
+
+
+def edit_image(prompt, image, model="grok-imagine-image-quality"):
+    """Natural-language edit of an existing image (POST /v1/images/edits).
+
+    `image` is a local path or URL. Returns the result image URL. This is the
+    ladder builder's workhorse: regressing a finished master still to earlier
+    carve stages preserves composition/palette in a way fresh text-to-image
+    never does (t2i renders finished subjects — measured 2026-07-26).
+    """
+    url = image if str(image).startswith("http") else file_to_data_uri(image)
+    r = requests.post(EDITS_URL, headers=_headers(),
+                       json={"model": model, "prompt": prompt,
+                             "image": {"url": url, "type": "image_url"},
+                             "response_format": "url"},
+                       timeout=180)
+    if r.status_code != 200:
+        sys.exit(f"ERROR: xAI edits API returned {r.status_code}: {r.text[:800]}")
+    data = r.json().get("data", [])
+    if not data:
+        sys.exit(f"ERROR: no edited image returned: {r.text[:800]}")
+    return data[0]["url"]
 
 
 # --------------------------------------------------------------------------- #
