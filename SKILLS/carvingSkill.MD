@@ -284,6 +284,44 @@ and interpolate between them.** Reserve plain i2v for shots that aren't
 changing carve state at all (a hero turn-in-hand, a pure hold) — those have
 nothing to pin and don't need it.
 
+**DEFAULT for transition/reveal beats: a stills+crossfade sequence, not Veo
+at all — reserve Veo entirely for shots where real tool motion is the
+point.** Every Veo failure mode above for transition shots (over-carved
+seed, wrong-place carving, seed-disregard, hallucinated props, mid-clip
+scene splice) is a *temporal* failure — it comes from Veo having 8 seconds
+of freedom with nothing anchoring the middle. A still image has none of that
+freedom: it's exactly what you built it to be, deterministically. Since
+carving progress can be told through *cuts between stages* (see "Why a
+montage" below) rather than continuous motion, a transition beat doesn't
+need video at all — only a shot where the knife is visibly moving does (a
+refinement shot, per this Step's lead rule; the hero hold).
+
+Technique:
+1. Build 3-5 intermediate stages between the transition's start and end
+   state, each a small additive edit of the previous one — same tooling and
+   same verification rigor as Step 2/4 (full resolution, check every named
+   region, don't just trust the one you're focused on; a still stage can
+   over-deliver exactly like a ladder rung can).
+2. Assemble as a fast crossfade sequence with a slight Ken-Burns pan per
+   stage — `build_reel.py` already does this natively (image shots get
+   pan/zoom via `zoompan`, blend via the `crossfade` config key), no new
+   tooling needed. Put the staged stills in `<proj>/media/` (build_reel.py
+   looks there, not `seeds/`) and list them in a `shots.json` with a short
+   `seconds` value per stage (~0.3-0.5s each reads as a fast reveal, not a
+   slideshow).
+3. This runs on the Gemini image-edit endpoint, not Veo — rate-limited by
+   Step 0's **2 requests/minute** Google API limit, not the Veo 1/min /
+   10-per-day cap, and doesn't compete with that budget at all.
+
+This is a reasoned recommendation from this project's failure evidence, not
+yet independently validated end-to-end on a delivered reel — build one
+transition beat this way and full-scrub it (Step 6's rigor applies to a
+stills sequence too: does the crossfade read as a carve, or as an obvious
+slideshow?) before trusting it wholesale. If a stills sequence doesn't read
+convincingly, fall back to the hand-built-end-frame interpolation technique
+above for that specific beat — it's still the right tool when real motion is
+worth spending Veo budget on.
+
 **A bounded, correctly-scoped prompt still carves in the WRONG PLACE when the
 subject has a face, even on a bold, high-contrast outline.** Measured on the
 Starbucks siren carve: two separate shots, each explicitly scoped to a small
