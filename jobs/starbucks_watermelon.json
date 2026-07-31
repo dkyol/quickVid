@@ -1,0 +1,59 @@
+{
+  "project": "starbucks_watermelon",
+  "aspect_ratio": "9:16",
+  "resolution": "1080p",
+  "_thesis": "7 shots, all BOUNDED small actions, NO interpolation (last_frame) at all — per carvingSkill.MD Step 5, every past failure on this pipeline was an interpolation shot covering a large change. The ladder rungs A(outline)->B(crown/star)->C(+face)->D(+hair)->E(border missing)->master already encode the whole progression, so cutting between wide/macro/wide seeds carries it, matching the reference reel's own technique of implying most removal across a cut. Budget: 7 generations, 1 take each, well under the user's 10/day Veo3-fast cap (3 in reserve for a re-roll if one shot fails QC).",
+  "style_suffix": "Shallow bas-relief carved INTO the curved watermelon rind, traditional Thai fruit carving of the Starbucks siren medallion. The carving never moves, blinks or breathes on its own — only the knife, the hand and falling shavings move. ONE knife in ONE hand, no second blade, no second hand. Only watermelon colors anywhere: dark green rind, pale green-white inner rind; no red flesh anywhere, no grey, no black, no brown. Soft flat diffused daylight, plain pale grey background, matte natural texture. Handheld macro, shallow focus, photorealistic. Crisp knife-on-rind cutting sounds, no music, no voices.",
+  "negative_prompt": "two knives, second knife, duplicate blade, extra hand, mirrored hands, large area removed at once, whole sheet of rind peeling, redesigned pattern, different logo, different face, cartoon, illustration, painting, airbrush, glowing, neon, red flesh, red juice, moving face, blinking, living person, text, watermark, subtitles, music, letterbox, black bars",
+  "shots": [
+    {
+      "name": "01_open",
+      "scale": "wide",
+      "seed": "stage_A_outline",
+      "takes": 1,
+      "prompt": "The hand brings the paring knife to the drawn line of the star at the top and makes TWO short careful scoring cuts along the star's points, each lifting a thin curl of dark green rind that falls away. Nothing else on the melon changes: the rest of the design stays a faint drawing on smooth intact rind, and by the end only those two small score marks exist."
+    },
+    {
+      "name": "02_star_macro",
+      "scale": "macro",
+      "seed": "crop_crown_star",
+      "takes": 1,
+      "prompt": "Extreme macro at the boundary where the freshly carved pale crown meets the untouched line-art border above it. The knife tip makes ONE short deep cut along that boundary and a single pale shaving curls off the blade and falls. The blade then lifts away. Nothing else changes."
+    },
+    {
+      "name": "03_crown",
+      "scale": "wide",
+      "seed": "stage_B_crown_star",
+      "takes": 1,
+      "prompt": "The hand works the knife along the already-carved crown's points, deepening them with THREE short strokes; small chips and thin curls of rind flick away and drop. The carving advances only slightly — the siren's face, hair and the border stay exactly the flat drawing they are now."
+    },
+    {
+      "name": "04_face",
+      "scale": "wide",
+      "seed": "stage_C_face",
+      "takes": 1,
+      "prompt": "The knife makes TWO short clean strokes at the very top of the hair, just beside the crown, lifting two thin curls of dark green rind so a little pale rind shows at the temple. The rest of the hair, and the whole border, stay exactly the flat drawing they are now — no large area is removed. The already-carved crown, star and face do not change."
+    },
+    {
+      "name": "05_hair_macro",
+      "scale": "macro",
+      "seed": "crop_hair_wave",
+      "takes": 1,
+      "prompt": "Extreme macro on one carved hair wave next to the still-flat leaf border. ONE knife in ONE hand traces the wave's edge once to deepen the groove, and a thin sliver of pale rind curls off and drops away. The flat drawn border beside it does not change."
+    },
+    {
+      "name": "06_border",
+      "scale": "wide",
+      "seed": "stage_E_no_border",
+      "takes": 1,
+      "prompt": "The knife works along the flat drawn leaf border ringing the medallion, carving THREE short strokes into two of the leaf shapes so they lift into shallow pale relief with clean cut edges; small chips drop below. The medallion itself — crown, star, face and hair — stays exactly as it is, fully carved and unchanged."
+    },
+    {
+      "name": "07_hero",
+      "scale": "wide",
+      "seed": "master",
+      "takes": 1,
+      "prompt": "The finished carved medallion rests in the hands, turning just a few degrees so the light moves across the relief. Nothing is cut and nothing is wiped — it simply holds for the reveal."
+    }
+  ]
+}

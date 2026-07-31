@@ -1,0 +1,31 @@
+{
+  "project": "starbucks_watermelon",
+  "aspect_ratio": "9:16",
+  "resolution": "1080p",
+  "_thesis": "Redo of the 3 shots that failed full-scrub QC in the first pass: 01_open and 03_crown both carved an unrequested vertical gash through the siren's face instead of touching only the star/crown; 06_border ignored its flat-border seed and started already fully carved. Prompts below are rewritten to state the CURRENT carved/uncarved state explicitly and forbid touching the wrong region, rather than only describing the desired action.",
+  "style_suffix": "Shallow bas-relief carved INTO the curved watermelon rind, traditional Thai fruit carving of the Starbucks siren medallion. The carving never moves, blinks or breathes on its own — only the knife, the hand and falling shavings move. ONE knife in ONE hand, no second blade, no second hand. Only watermelon colors anywhere: dark green rind, pale green-white inner rind; no red flesh anywhere, no grey, no black, no brown. Soft flat diffused daylight, plain pale grey background, matte natural texture. Handheld macro, shallow focus, photorealistic. Crisp knife-on-rind cutting sounds, no music, no voices.",
+  "negative_prompt": "two knives, second knife, duplicate blade, extra hand, mirrored hands, large area removed at once, whole sheet of rind peeling, redesigned pattern, different logo, different face, cut through the face, vertical slash through center, carving unrelated area, wrong location, border already carved at start, pre-finished carving, static unchanging shot, cartoon, illustration, painting, airbrush, glowing, neon, red flesh, red juice, moving face, blinking, living person, text, watermark, subtitles, music, letterbox, black bars",
+  "shots": [
+    {
+      "name": "01_open",
+      "scale": "wide",
+      "seed": "stage_A_outline",
+      "takes": 1,
+      "prompt": "Extreme close attention to LOCATION: near the TOP of the melon, right under the resting hand, sits a five-pointed star inside a crown shape, drawn only as a faint thin dark outline on the intact green rind. The knife touches ONLY that star: it makes TWO short careful scoring cuts along two points of the star, each lifting a thin curl of dark green rind that falls away. The knife never travels down toward the middle or lower half of the melon. The siren's face and body in the center of the design, and everything below the crown, remain completely smooth, untouched, unmarked intact dark green rind — no cut, no line, no mark appears there. By the end only those two small score marks on the star exist."
+    },
+    {
+      "name": "03_crown",
+      "scale": "wide",
+      "seed": "stage_B_crown_star",
+      "takes": 1,
+      "prompt": "The crown and star at the top of the medallion, and the leaf border ringing it, are ALREADY carved into pale relief — finished. Below the crown, filling the rest of the circle, is the siren's face and hair, drawn only as a faint thin dark outline on smooth intact dark green rind — completely uncarved. The hand works the knife along the ALREADY-CARVED crown's points only, deepening two of them with short strokes; small chips and thin curls of rind flick away and drop. The knife stays on the crown the entire time and never crosses down into the face or hair area below it — the face, closed eyes, hair and neck remain completely smooth, untouched, unmarked intact dark green rind with only their faint outline, exactly as they are now."
+    },
+    {
+      "name": "06_border",
+      "scale": "wide",
+      "seed": "stage_E_no_border",
+      "takes": 1,
+      "prompt": "The siren's face, hair, crown and star inside the medallion ring are already fully carved into pale relief — finished. The decorative leaf pattern in the ring OUTSIDE the medallion, all the way around, is CURRENTLY UNCARVED: it is only a faint thin dark outline drawing on smooth, intact, untouched dark green rind, with no relief, no depth and no leaf texture cut into it yet — the outer ring must look flat and smooth at the very start of the shot, not already textured. The knife makes its FIRST cuts of the scene into that flat outer ring: THREE short strokes carving two of the leaf shapes into shallow pale relief with clean cut edges, small chips dropping below as it goes. The medallion interior does not change."
+    }
+  ]
+}

@@ -162,6 +162,40 @@ necessary but **not sufficient** — a ladder can be perfectly monotonic and
 still split into two visually different "families." Fix the drifted rung
 before spending, not after.
 
+**The 250x444 thumbnail is not enough by itself — open every rung at full
+resolution too.** Measured on a Starbucks-medallion carve (2026-07-30): the
+hstack audit was eyeballed at thumbnail size and passed, but two rungs
+(`stage_C_face`, `stage_D_hair`) had actually drifted to ~100% carved —
+matching the master almost exactly, including the border, which the prompt
+explicitly said to leave flat — despite looking like a plausible partial
+state at thumbnail scale. The defect was invisible until each PNG was opened
+individually at native size. **For a forward-chain rung, specifically verify
+the region the prompt named "stays flat" actually reads as flat outline art,
+not just that the region being added looks right** — that's the direction
+most prone to silent drift, because a rung that over-delivers still *looks*
+like a finished, good carving in isolation; only comparing it against its own
+prompt's constraints catches it.
+
+**Peripheral/framing regions (a border ring, a background pattern) are the
+LEAST reliably held flat during an additive edit — even less reliable than
+the subject's own features.** The wolf ladder's lesson was "the model can't
+un-carve the subject." The Starbucks ladder surfaced a sharper version: even
+when a region is never touched by name in a prompt and is *outside* the
+subject entirely, an edit model asked to add detail elsewhere will often
+"finish" that untouched peripheral region anyway — its training prior toward
+a complete, plausible-looking carved watermelon outweighs an instruction to
+leave one area alone. Treat any rung with a from-the-master peripheral
+element (a border, a background texture) as needing its own explicit
+full-resolution check every time, not just once.
+
+**If a forward-chain rung has drifted, don't assume the NEXT link in the
+chain is safe just because it "only adds one more region."** On the wolf
+ladder, drift accumulated gradually over 3-4 links. On the Starbucks ladder,
+one rung (`stage_C_face`) drifted to ~100% after a single additive edit from
+a correct `stage_B`. Distance from the master in *edit count* is not a
+reliable proxy for distance in *carved percentage* — always check the actual
+image, every rung, every time, regardless of how few edits deep it is.
+
 ## Step 5 — generate video (Veo 3.1)
 
 **Ask for a small bounded action per shot, not a transformation.** The
@@ -174,6 +208,61 @@ and falls," not "carving happens") has never failed this way. **Reserve
 interpolation for exactly one shot: the single moment where showing the
 transformation on-camera actually matters** (e.g., a mouth/cut opening to
 reveal the interior) — that's the only place it has held up.
+
+**A bounded, correctly-scoped prompt still carves in the WRONG PLACE when the
+subject has a face, even on a bold, high-contrast outline.** Measured on the
+Starbucks siren carve: two separate shots, each explicitly scoped to a small
+peripheral region (the star, the crown), instead cut an unrequested gash
+straight down through the siren's face — on outlines that passed the
+low-contrast check from Step 2's own guidance. A face-forward subject (a
+face, a mascot, a recognizable character) appears to carry a strong model
+prior toward carving the face first regardless of which region the prompt
+names. Mitigation that worked: state the CURRENT carved/uncarved condition of
+every named region explicitly ("X is already carved — finished"; "Y remains
+completely smooth, untouched, unmarked intact rind"), not just the desired
+action, and add an explicit negative clause naming the face directly ("the
+knife never touches the face; it remains completely smooth and unmarked").
+This raised the pass rate but did not make it reliable — budget for at least
+one retake on any shot whose seed includes an uncarved face, even a
+well-scoped one.
+
+**Don't ask a single 8-second shot to hold a "mostly finished, one region
+still flat" state across most of the frame — Veo will often just render the
+whole frame as finished, or worse, splice in an unrelated close-up mid-clip.**
+Measured on the Starbucks border shot: seeded from a rung where the interior
+was fully carved and only a thin border ring was still flat line-art, TWO
+separate takes both opened already showing the border fully carved (ignoring
+the seed's actual state entirely), and the second take additionally hard-cut
+mid-clip to a completely different, disconnected close-up composition that
+had nothing to do with the wide framing requested. A large "finished" area
+dominating the frame seems to pull the model toward treating the whole shot
+as already complete. If a shot needs to show one small area mid-carve while
+everything else is done, prefer framing it as a macro tightly cropped on
+JUST that area (small finished-vs-flat boundary filling most of the frame) —
+the macro pattern from Step 3 — rather than a wide shot where the unfinished
+region is a small fraction of an otherwise-finished frame. If a shot fails
+this way on its first take, rewriting the prompt with stronger language is
+not a reliable fix by itself — it failed the same way twice on the Starbucks
+run — treat a second failure on the same seed as a signal to redesign the
+shot's framing, not just its wording.
+
+**Every shot needs an explicit static-camera, centered-subject guard, or the
+subject will visibly drift across cuts.** Each shot in a montage is an
+INDEPENDENT generation with no shared camera lock, so Veo is free to frame,
+zoom, and position the hand-held subject slightly differently on every call
+— even from seeds with visually identical composition. Measured on the
+Starbucks reel: the melon's apparent size and vertical position differed
+noticeably between wide shots that were meant to look like the same
+continuous shot, which reads as the subject jumping/drifting once cut
+together — this is what a viewer flags as "keep it centered," and it cannot
+be fixed in the recut alone (see Step 7). `veo_carve.py` now appends a
+`DEFAULT_STYLE_GUARD` ("static locked-off camera; the subject stays
+centered... camera does not pan, drift, zoom") to every shot's prompt
+unconditionally, so this no longer depends on a job's `style_suffix`
+remembering to say it — but it does not fully solve it (i2v models still
+vary framing shot to shot even when asked not to) — treat framing
+consistency as something to verify at Step 6/7, not something the prompt
+alone guarantees.
 
 ```powershell
 python veo_carve.py --job jobs/<name>.json --dry-run          # verify prompts/seeds resolve, free
@@ -236,13 +325,31 @@ not spot-check:
 A naive equal-length stitch reads as synthetic and wastes the technique's
 own strengths. Free, no regeneration needed:
 
+- **MANDATORY before picking crop/zoom values: check the subject's size and
+  position across every wide shot you're about to cut together.** Because
+  each shot is an independent Veo generation (see Step 5's camera-lock
+  note), the melon can land at meaningfully different scale and vertical
+  position in different "wide" shots even when they're seeded from the same
+  composition. Pull a frame from each candidate wide shot at the same scale
+  and eyeball them side by side (a small hstack, same trick as Step 4's
+  ladder audit) before choosing trim windows or zoom values — don't assume
+  "wide" means "same framing." Measured on the Starbucks reel: this check
+  was skipped, a single fixed zoom was applied to every wide shot alike, and
+  the melon visibly changed size/position across cuts in the delivered
+  reel — the exact defect a viewer calls "keep it centered."
 - **Vary the shot durations.** A fast burst early, longer shots for the
   money moment, one deliberately tiny (~0.3-0.5s) "flash" cut for an
   unavoidable wide→macro jump — a discontinuity that resolves before the
   eye catches it reads as energy, not error.
-- **Punch in on wide shots** (crop to zoom ~1.3-1.45, centered, rescale to
-  output size) so consecutive shots share more visual mass across a cut;
-  macros are usually already tight enough.
+- **Punch in on wide shots CENTERED ON THE SUBJECT, not on the frame.** A
+  naive `crop=iw/z:ih/z:(iw-iw/z)/2:(ih-ih/z)/2` crops around the frame's
+  geometric center — if the subject isn't dead-center in that particular
+  clip (see the check above), this crop does nothing to correct it and can
+  make the apparent jump worse. Measure roughly where the subject actually
+  sits in each clip (eyeball the hstack check) and offset the crop origin
+  per-shot so the subject lands in the same place in the output frame every
+  time, rather than using one zoom/offset pair for every wide shot. Macros
+  are usually already tight enough to skip this.
 - **Match content across a cut, not just scale** — end a wide shot on a
   frame where some of the next macro's texture is already visible, rather
   than cutting from bare surface straight to a fully-textured close-up.
@@ -256,13 +363,23 @@ own strengths. Free, no regeneration needed:
   count and cut-jump magnitude against a reference reel if you have one.
   More cuts detected than shots means an in-shot jump (usually an
   interpolation snap) is severe enough to read as its own edit — fix that
-  shot's trim window before shipping.
+  shot's trim window before shipping. **Caveat, measured on a slow hero
+  turn-in-light shot:** this filter can also fire repeatedly on a single
+  shot with no cut at all, if a rotating/reflective surface shifts specular
+  highlights enough frame to frame — six phantom hits appeared inside one
+  smooth, defect-free hero clip on the Starbucks reel. Before treating extra
+  detections as a real defect, eyeball a dense scrub of exactly that shot's
+  window first (see Step 6) — don't trust the count in isolation.
 
 ## Step 8 — final checklist
 
 - [ ] scrubbed every promoted clip full-length, not spot-checked
-- [ ] scene-detected cuts == number of shots (no phantom in-shot jumps)
+- [ ] scene-detected cuts == number of shots (no phantom in-shot jumps —
+      but verify any extra hits against a scrub before treating them as real)
 - [ ] the subject is the same subject/style in every shot, no mid-reel drift
+- [ ] **the subject is the same SIZE and POSITION in every shot that's meant
+      to read as continuous** — check this explicitly with a side-by-side
+      (Step 7), don't rely on the crop math alone
 - [ ] one tool, one hand, throughout (no duplicates)
 - [ ] full frame, no letterboxing
 - [ ] not fully finished before the final third; no un-requested wipe/reveal
@@ -280,6 +397,14 @@ own strengths. Free, no regeneration needed:
 4. Regenerate the broken shot, never the whole reel.
 5. Generate multiple takes only where takes actually vary in quality
    (i2v shots with real motion); rank, scrub the full clip, then promote.
+6. **For a face-forward subject (a face, a mascot, a recognizable logo with
+   a face in it) you haven't carved before, spend one generation on the
+   riskiest shot — one where the seed has an uncarved face nearby — as a
+   canary before committing the rest of the shot list.** The Starbucks reel
+   discovered its face-bias wrong-place-carving failure mode (Step 5) only
+   after committing most of a day's rate-limited budget to the full shot
+   list; a single canary shot would have surfaced it for the cost of one
+   generation instead of three.
 
 ## Why a montage, not one continuous generation
 

@@ -53,6 +53,46 @@ TIMEOUT_SECONDS = 900
 MAX_RETRIES = 4
 RETRY_BACKOFF = [20, 45, 90]         # 503 only — see QuotaExhausted below
 
+# Hard user-stated caps for the Veo 3 Fast key on this project: no more than
+# 1 generate_videos submission per minute, no more than 10 per day. Enforced
+# per-process (this script isn't invoked often enough in one day to need
+# cross-process persistence) — every attempt, including 503 retries, counts,
+# since each is a real request against the quota.
+MIN_SUBMIT_INTERVAL = 61
+DAILY_SUBMIT_CAP = 10
+_last_submit_ts = [0.0]
+_submit_count = [0]
+
+# Applied to EVERY shot's prompt unconditionally, regardless of whether a
+# job's own style_suffix remembers to say it. Added after the Starbucks
+# carve (2026-07-30): each shot is an independent generation with no shared
+# camera lock, so Veo is free to frame/zoom/position the hand-held subject
+# slightly differently call to call even from visually-identical seeds — the
+# melon visibly drifted in size/position across cuts in that reel. This does
+# not fully fix it (framing still varies somewhat) but a job that forgets to
+# ask for it drifts worse. See carvingSkill.MD Step 5/7 for the fuller
+# writeup and the recut-side mitigation this alone can't replace.
+DEFAULT_STYLE_GUARD = (
+    "Static locked-off camera; the subject stays centered in frame and "
+    "fills the same proportion of the frame as at the start of the shot; "
+    "camera does not pan, drift, zoom or reframe during the shot."
+)
+
+
+def _throttle_submit():
+    now = time.time()
+    elapsed = now - _last_submit_ts[0]
+    if _last_submit_ts[0] and elapsed < MIN_SUBMIT_INTERVAL:
+        wait = MIN_SUBMIT_INTERVAL - elapsed
+        print(f"  [throttle] waiting {wait:.0f}s to respect the 1/min cap")
+        time.sleep(wait)
+    _submit_count[0] += 1
+    if _submit_count[0] > DAILY_SUBMIT_CAP:
+        sys.exit(f"ERROR: hit the {DAILY_SUBMIT_CAP}/day Veo submission cap "
+                 f"for this run. Stop and resume tomorrow, or raise "
+                 f"DAILY_SUBMIT_CAP if the account limit is actually higher.")
+    _last_submit_ts[0] = time.time()
+
 
 class QuotaExhausted(RuntimeError):
     """429 RESOURCE_EXHAUSTED — never retried, always aborts the run.
@@ -143,6 +183,7 @@ def generate(cl, prompt, seed_path, dst, seed_end_path=None,
     op = None
     for attempt in range(MAX_RETRIES):
         try:
+            _throttle_submit()
             op = cl.models.generate_videos(
                 model=model, prompt=prompt, image=load_image(seed_path),
                 config=types.GenerateVideosConfig(**cfg))
@@ -391,7 +432,7 @@ def main():
         if args.shot and args.shot != name:
             continue
         dst = os.path.join(media_dir, f"veo_{name}.mp4")
-        prompt = f"{shot['prompt']} {style}".strip()
+        prompt = f"{shot['prompt']} {style} {DEFAULT_STYLE_GUARD}".strip()
         seed = resolve_seed_path(shot["seed"], proj_dir)
         seed_end = (resolve_seed_path(shot["seed_end"], proj_dir)
                     if shot.get("seed_end") else None)
