@@ -1,0 +1,18 @@
+{
+  "project": "starbucks_watermelon",
+  "aspect_ratio": "9:16",
+  "resolution": "1080p",
+  "_thesis": "06_border, 3rd attempt. Root cause of the previous defect (user-flagged: not centered, green-under-green when the curl lifts): crop_border_start was cropped near the crown's fin/rib decorative element (a zigzag comb shape), so the shot ambiguously straddled the true leaf-vine border AND the fin, and Veo cut at the seam between them with an implausible color transition. New crop (crop_border_start_v2/crop_border_end_v2) is taken from a clean band of pure leaf-vine border, well below the fin zone, with an explicit no-green-underneath guard in the end-frame edit.",
+  "style_suffix": "Shallow bas-relief carved INTO the curved watermelon rind, traditional Thai fruit carving of the Starbucks siren medallion. The carving never moves, blinks or breathes on its own -- only the knife, the hand and falling shavings move. ONE knife in ONE hand, no second blade, no second hand. Only watermelon colors anywhere: dark green rind, pale green-white inner rind; no red flesh anywhere, no grey, no black, no brown. A cut through the dark green rind ALWAYS reveals the solid pale cream inner rind underneath, never another green layer. Soft flat diffused daylight, plain pale grey background, matte natural texture. Handheld macro, shallow focus, photorealistic. Crisp knife-on-rind cutting sounds, no music, no voices.",
+  "negative_prompt": "two knives, second knife, duplicate blade, extra hand, mirrored hands, large area removed at once, whole sheet of rind peeling, redesigned pattern, different logo, entire border carved, green rind visible under a cut, double green layer, hands disappearing, stand, pedestal, base, prop change, wrong location, static unchanging shot, unrelated close-up, scene change mid-clip, cartoon, illustration, painting, airbrush, glowing, neon, red flesh, red juice, text, watermark, subtitles, music, letterbox, black bars",
+  "shots": [
+    {
+      "name": "06_border",
+      "scale": "macro",
+      "seed": "crop_border_start_v2",
+      "seed_end": "crop_border_end_v2",
+      "takes": 1,
+      "prompt": "Extreme macro close-up on the decorative leaf-vine border, carved hair visible at right. The knife makes clean cuts along two leaf outlines, lifting thin curls of dark green rind that fall away, carving those two leaves into shallow pale cream relief -- the exposed surface under the lifted curl is solid pale cream, never green. Nothing else changes: every other leaf shape stays completely smooth, untouched, unmarked intact dark green rind with only its faint outline. The hands and camera framing never move or change."
+    }
+  ]
+}

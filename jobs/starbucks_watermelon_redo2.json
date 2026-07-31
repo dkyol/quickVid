@@ -1,0 +1,24 @@
+{
+  "project": "starbucks_watermelon",
+  "aspect_ratio": "9:16",
+  "resolution": "1080p",
+  "_thesis": "Second redo of the 2 shots that failed every prior attempt. Root causes fixed: (1) 04_face's old seed (stage_C_face) was a broken/over-carved ladder rung -- replaced with a fresh macro crop (crop_face_start) from the verified-good stage_B_crown_star rung. (2) 06_border's old seed had lost the leaf-shape line-art in the flat border (collapsed to a blank ring with nothing to follow) -- rebuilt stage_E_no_border with explicit leaf-outline preservation, then cropped a macro from it. (3) Both are now framed as tight MACROS instead of wide shots, per carvingSkill.MD Step 5's 'mixed completion state' lesson -- a wide shot with a large finished area pulls Veo toward rendering everything as done; a macro where the flat/carved boundary fills most of the frame does not. 04_face goes first as a canary (highest risk: touching an uncarved face at all, per the face-bias lesson) before spending on 06_border.",
+  "style_suffix": "Shallow bas-relief carved INTO the curved watermelon rind, traditional Thai fruit carving of the Starbucks siren medallion. The carving never moves, blinks or breathes on its own -- only the knife, the hand and falling shavings move. ONE knife in ONE hand, no second blade, no second hand. Only watermelon colors anywhere: dark green rind, pale green-white inner rind; no red flesh anywhere, no grey, no black, no brown. Soft flat diffused daylight, plain pale grey background, matte natural texture. Handheld macro, shallow focus, photorealistic. Crisp knife-on-rind cutting sounds, no music, no voices.",
+  "negative_prompt": "two knives, second knife, duplicate blade, extra hand, mirrored hands, large area removed at once, whole sheet of rind peeling, redesigned pattern, different logo, different face, entire face carved at once, entire border carved at once, wrong location, border already carved at start, pre-finished carving, static unchanging shot, unrelated close-up, scene change mid-clip, cartoon, illustration, painting, airbrush, glowing, neon, red flesh, red juice, moving face, blinking, living person, text, watermark, subtitles, music, letterbox, black bars",
+  "shots": [
+    {
+      "name": "04_face",
+      "scale": "macro",
+      "seed": "crop_face_start",
+      "takes": 1,
+      "prompt": "Extreme macro close-up: at the top of frame, the crown and star are already carved into pale relief -- finished. Below that, filling the rest of the frame, is the siren's face, drawn ONLY as a faint thin dark outline on smooth, intact, completely unmarked dark green rind -- totally uncarved, no relief anywhere on the face yet. The knife makes its FIRST cut of the scene: ONE short clean stroke along the outline of just the LEFT eyebrow, lifting a single thin curl of dark green rind that falls away, carving that one small eyebrow shape into shallow pale relief. Nothing else on the face changes -- the eyes, nose, mouth, cheeks and all hair remain completely smooth, untouched, unmarked intact dark green rind with only their faint outline. The blade then lifts away."
+    },
+    {
+      "name": "06_border",
+      "scale": "macro",
+      "seed": "crop_border_start",
+      "takes": 1,
+      "prompt": "Extreme macro close-up: on the right side of frame, carved hair and medallion detail are already finished pale relief. On the left, a decorative leaf-vine pattern is drawn ONLY as a faint thin dark outline on smooth, intact, completely unmarked dark green rind -- the individual leaf shapes are visible as outline only, not yet carved, no relief anywhere in this outer band. The knife makes its FIRST cuts of the scene: TWO short clean strokes carving ONE leaf shape along its drawn outline into shallow pale relief, a thin curl of dark green rind lifting and falling away. The rest of the leaf pattern, above and below, remains completely smooth, untouched, unmarked intact dark green rind with only its faint outline. The blade then lifts away."
+    }
+  ]
+}

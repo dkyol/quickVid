@@ -142,6 +142,24 @@ python make_ladder.py --master <proj>/seeds/master.png --crops-only \
 A macro needs at least one recognizable landmark in frame plus the boundary
 — too tight a crop reads as an abstract blob, not a carving.
 
+**Pick crop coordinates from a grid overlay on the actual image, not by
+guessing fractions freehand — especially near a design with multiple
+close-together decorative elements.** A round/curved subject distorts where
+content actually lands at a given fractional height, and adjacent decorative
+elements (e.g. a small carved "fin" or flourish next to the main border
+pattern) are easy to straddle by accident. A crop that captures two different
+elements at once gives the video model an ambiguous target: measured on the
+Starbucks reel, a border crop that included both the intended leaf-vine
+pattern AND an adjacent carved decorative fin produced a take that cut at the
+seam between them with an implausible color transition, not cleanly on
+either element. Fix:
+```powershell
+ffmpeg.exe -y -i stage_X.png -vf "drawgrid=w=iw/10:h=ih/10:t=1:c=red@0.7" -update 1 -frames:v 1 grid.png
+```
+Read exact coordinates for the ONE element you want off the grid, then verify
+the resulting crop contains nothing else before using it as a seed — don't
+just guess a box and eyeball the result; iterate against the grid.
+
 ## Step 4 — MANDATORY: audit the whole ladder before spending on video
 
 Side-by-side every rung, free, before any paid generation:
@@ -196,18 +214,75 @@ a correct `stage_B`. Distance from the master in *edit count* is not a
 reliable proxy for distance in *carved percentage* — always check the actual
 image, every rung, every time, regardless of how few edits deep it is.
 
+**After fixing ONE defect in a rung, re-check EVERY region the prompt named
+— not just the one you were worried about.** A single rung can over-deliver
+in multiple, unrelated ways across separate rebuild attempts, and fixing one
+doesn't mean the others are fine. Measured on the Starbucks `stage_B_crown_star`
+rung: it was rebuilt three times, and each rebuild fixed the one thing being
+checked while a DIFFERENT region was silently wrong — first the border carved
+early (should have stayed flat), then the crescent background color inverted
+(fixed, verified), then — after THAT fix passed its own check — the hair also
+turned out fully carved despite the prompt saying it should stay flat, caught
+only when a downstream crop of it looked wrong. None of these were caught by
+re-auditing just the region that had failed before; each needed a fresh look
+at the whole rung against its whole prompt.
+
+**A rung that feeds multiple downstream shots/crops multiplies the cost of a
+missed defect.** `stage_B_crown_star` fed a macro crop, a wide shot, AND a
+second macro crop's source — one bad rung silently poisoned three separate
+video generations at once before it was caught. Audit a rung MORE carefully,
+not the same amount, before cutting multiple crops or wide shots from it.
+
 ## Step 5 — generate video (Veo 3.1)
 
-**Ask for a small bounded action per shot, not a transformation.** The
-single biggest failure mode across every past run: an interpolation shot
-(seed → end-frame) asked to cover a *large* change reliably does something
-implausible — removes half the subject in one sweep, redesigns it mid-clip,
-or renders duplicate tools/hands. A plain image-to-video shot asked for one
-small, concrete, bounded action (with visible debris — "a strip curls off
-and falls," not "carving happens") has never failed this way. **Reserve
-interpolation for exactly one shot: the single moment where showing the
-transformation on-camera actually matters** (e.g., a mouth/cut opening to
-reveal the interior) — that's the only place it has held up.
+**The single most reliable shot type: deepen an ALREADY-CARVED region, don't
+carve a flat one for the first time.** Compare a wolf carving reel's most
+delicate-looking moments (pulled the actual frames and job prompts to check)
+against the Starbucks reel's flat-to-carved shots: the wolf reel's best shots
+are all seeded from an already-carved area and ask for a FEW SMALL
+REFINEMENT strokes, e.g. `03_ears`: "the hand works the knife along the
+already-carved ear edges, deepening them with THREE short strokes," or
+`04_eye_macro`: "traces the eye's edge once to deepen the socket." Nothing
+changes STATE in these shots — they start and end carved, and the knife just
+makes brief contact, a chip or curl flicks off. That's a fundamentally
+easier, safer ask than any flat-to-carved transition, because there's no
+state for the model to get wrong. **Build MOST of a reel's shots this way**:
+pick a rung that's already carved in the region you want to feature and ask
+for small deepening/detailing strokes, not a transformation. Reserve actual
+flat-to-carved transitions (see the interpolation guidance below) for the 1-2
+shots where showing the change on-camera is the actual point — most of a
+reel's motion and "watch it get carved" feeling should come from refinement
+shots on rungs that are already mid-progress, with the PROGRESSION itself
+carried by which rung each successive shot is seeded from (a later, more-
+carved rung), not by any single shot visibly transforming.
+
+**Ask for a small bounded action per shot, not a transformation — and for
+that small action, PREFER first+last-frame interpolation with a hand-built
+end-frame over open-ended image-to-video.** An earlier version of this file
+said to reserve interpolation for one single shot per reel; the Starbucks
+carve overturned that. Two separate lessons had been conflated into one:
+- **Large transformations fail regardless of technique.** An interpolation
+  shot asked to cover a *large* change (a full reveal, most of a face)
+  reliably does something implausible — removes half the subject in one
+  sweep, redesigns it mid-clip, or renders duplicate tools/hands. This part
+  still holds.
+- **For a genuinely SMALL bounded change, open-ended image-to-video is the
+  LESS reliable technique, not the safer default.** Measured on the
+  Starbucks siren carve: three separate plain-i2v attempts at "carve one
+  small facial feature" each failed differently — an over-carved seed, a
+  wrong-place slash through the face, and seed-disregard plus a hallucinated
+  stand appearing under the melon — because nothing anchors where the shot
+  is allowed to end; Veo is free to improvise the entire 8 seconds. Switching
+  the SAME beat to `last_frame` interpolation, seeding BOTH the start frame
+  and a hand-edited end frame (one more Gemini edit: "same image, only this
+  one small feature is now carved, everything else pixel-identical"), worked
+  on the first attempt — and again on a second beat (one border leaf) after
+  the same treatment.
+
+So: **build a matching end-frame for any shot showing a small state change,
+and interpolate between them.** Reserve plain i2v for shots that aren't
+changing carve state at all (a hero turn-in-hand, a pure hold) — those have
+nothing to pin and don't need it.
 
 **A bounded, correctly-scoped prompt still carves in the WRONG PLACE when the
 subject has a face, even on a bold, high-contrast outline.** Measured on the
@@ -246,6 +321,19 @@ not a reliable fix by itself — it failed the same way twice on the Starbucks
 run — treat a second failure on the same seed as a signal to redesign the
 shot's framing, not just its wording.
 
+**A cut must reveal the material's correct INNER layer color, or it reads as
+physically impossible — state this explicitly, don't assume it's obvious.**
+Measured on the Starbucks border shot: a take showed the knife lifting a curl
+of dark green rind, but the surface exposed underneath was ALSO dark green
+instead of the expected pale inner rind, as if the rind had two stacked
+layers of skin. Nothing in the prompt had asserted what should be UNDER the
+cut, only what the cut should look like from outside. Add a material-specific
+rule to the job's `style_suffix`: "a cut through the [outer color] rind
+always reveals the [inner color] beneath it, never another layer of [outer
+color]" — and once you've seen the failure happen once, add its own words to
+`negative_prompt` too ("green rind visible under a cut", "double green
+layer").
+
 **Every shot needs an explicit static-camera, centered-subject guard, or the
 subject will visibly drift across cuts.** Each shot in a montage is an
 INDEPENDENT generation with no shared camera lock, so Veo is free to frame,
@@ -273,6 +361,17 @@ Per shot: `resolution: 1080p` + `last_frame` (interpolation) both force
 `duration=8`. Seed aspect must match the job's aspect — mismatch =
 letterbox. `negative_prompt` for the "two knives / duplicate hand / living
 animal" guards.
+
+**`--force` gotcha: a shot's output path is keyed only by NAME
+(`media/veo_<name>.mp4`), not by which job file produced it.** Re-running the
+same shot name under a different or corrected job file (a redo job, a fixed
+prompt) silently SKIPS generation and leaves the OLD — possibly broken —
+clip in place unless you pass `--force`. The console prints `[skip] <name>
+exists`, which is easy to miss when scanning output for errors, and moving on
+without checking wastes a turn believing a fix was applied when it wasn't —
+this happened three times in one session before the pattern was caught.
+**Always check the output file's timestamp after every regeneration
+(`ls -la media/veo_<name>.mp4`) — don't trust the console output alone.**
 
 ## Step 6 — MANDATORY: scrub the ENTIRE clip before promoting a take
 
@@ -319,6 +418,18 @@ not spot-check:
   the drawn line, not just somewhere plausible-looking? If the outline is
   too faint to trace reliably across takes, fix the seed (bolder/higher-
   contrast outline) rather than re-rolling takes against the same seed.
+
+**An independent review pass (even from a stronger/different model) is a
+good supplement but not a replacement for actually watching the assembled
+reel yourself at full resolution.** On the Starbucks reel, an independent
+cold review caught two real, serious defects (a narrative regression, an
+inverted color) that the original pass missed — but it also described a
+genuinely broken shot (a crop that had captured the wrong design element
+entirely) as merely "hair rays / fin" without flagging anything wrong. The
+user's own eye, not either automated pass, caught it. Use independent review
+to catch what you're too close to see, but a clean review report is not
+proof the reel is actually clean — do your own final full-resolution
+watch-through too.
 
 ## Step 7 — assembly: never stitch on even slots
 

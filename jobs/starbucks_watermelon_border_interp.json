@@ -1,0 +1,18 @@
+{
+  "project": "starbucks_watermelon",
+  "aspect_ratio": "9:16",
+  "resolution": "1080p",
+  "_thesis": "06_border via first+last-frame interpolation, same fix that worked for 04_face. crop_border_start (flat leaf-outline border) -> crop_border_end (topmost leaf carved into pale relief, everything else pinned identical, hand-edited via Gemini).",
+  "style_suffix": "Shallow bas-relief carved INTO the curved watermelon rind, traditional Thai fruit carving of the Starbucks siren medallion. The carving never moves, blinks or breathes on its own -- only the knife, the hand and falling shavings move. ONE knife in ONE hand, no second blade, no second hand. Only watermelon colors anywhere: dark green rind, pale green-white inner rind; no red flesh anywhere, no grey, no black, no brown. Soft flat diffused daylight, plain pale grey background, matte natural texture. Handheld macro, shallow focus, photorealistic. Crisp knife-on-rind cutting sounds, no music, no voices.",
+  "negative_prompt": "two knives, second knife, duplicate blade, extra hand, mirrored hands, large area removed at once, whole sheet of rind peeling, redesigned pattern, different logo, entire border carved, hands disappearing, stand, pedestal, base, prop change, wrong location, static unchanging shot, unrelated close-up, scene change mid-clip, cartoon, illustration, painting, airbrush, glowing, neon, red flesh, red juice, text, watermark, subtitles, music, letterbox, black bars",
+  "shots": [
+    {
+      "name": "06_border",
+      "scale": "macro",
+      "seed": "crop_border_start",
+      "seed_end": "crop_border_end",
+      "takes": 1,
+      "prompt": "Extreme macro close-up on the decorative leaf-vine border, carved hair visible at right. The knife makes one short clean cut along the topmost leaf's drawn outline, lifting a thin curl of dark green rind that falls away, carving that single leaf into shallow pale relief. Nothing else changes: every other leaf shape above and below stays completely smooth, untouched, unmarked intact dark green rind with only its faint outline. The hands and camera framing never move or change."
+    }
+  ]
+}

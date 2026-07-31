@@ -1,0 +1,18 @@
+{
+  "project": "starbucks_watermelon",
+  "aspect_ratio": "9:16",
+  "resolution": "1080p",
+  "_thesis": "04_face, 4th attempt: first+last-frame interpolation instead of free-running i2v. Every prior attempt (drifted ladder seed / wrong-place slash / seed-disregard+hallucinated stand) was open-ended i2v with nothing pinning the end state. This pins BOTH ends -- crop_face_start (flat face) to crop_face_end (same image, hand-edited so only both eyebrows are carved, everything else pixel-identical) -- which is Veo's most reliable mode per carvingSkill.MD Step 5, previously avoided here only because past interpolation failures were on LARGE transformations (full mouth reveals). This is a much smaller ask: one small symmetric feature, not a full reveal.",
+  "style_suffix": "Shallow bas-relief carved INTO the curved watermelon rind, traditional Thai fruit carving of the Starbucks siren medallion. The carving never moves, blinks or breathes on its own -- only the knife, the hand and falling shavings move. ONE knife in ONE hand, no second blade, no second hand. Only watermelon colors anywhere: dark green rind, pale green-white inner rind; no red flesh anywhere, no grey, no black, no brown. Soft flat diffused daylight, plain pale grey background, matte natural texture. Handheld macro, shallow focus, photorealistic. Crisp knife-on-rind cutting sounds, no music, no voices.",
+  "negative_prompt": "two knives, second knife, duplicate blade, extra hand, mirrored hands, large area removed at once, whole sheet of rind peeling, redesigned pattern, different logo, different face, entire face carved, hands disappearing, stand, pedestal, base, prop change, wrong location, static unchanging shot, unrelated close-up, scene change mid-clip, cartoon, illustration, painting, airbrush, glowing, neon, red flesh, red juice, moving face, blinking, living person, text, watermark, subtitles, music, letterbox, black bars",
+  "shots": [
+    {
+      "name": "04_face",
+      "scale": "macro",
+      "seed": "crop_face_start",
+      "seed_end": "crop_face_end",
+      "takes": 1,
+      "prompt": "Extreme macro close-up on the siren's face, crown and star already carved above. The knife makes two short clean cuts, one along each eyebrow's drawn outline, lifting two small thin curls of dark green rind that fall away, carving both eyebrows into shallow pale relief. Nothing else changes: the eyes, nose, mouth, cheeks and all hair remain completely smooth, untouched, unmarked intact dark green rind with only their faint outline. The hands and camera framing never move or change."
+    }
+  ]
+}

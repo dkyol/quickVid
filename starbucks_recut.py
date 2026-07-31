@@ -1,23 +1,38 @@
-"""starbucks_recut.py — varied-rhythm assembly of the 5 clips that survived
-full-length QC (see conversation): 01_open and 02_star_macro both drift late
-in their 8s (01 runs away to a finished carve ~4-5s in; 02 punches a stray
-hole in the star tip ~7s in) so both are trimmed to an EARLY clean window,
-never the tail. 03_crown, 05_hair_macro, 07_hero are clean throughout. 04_face
-and 06_border failed QC on every take generated and are dropped — the border/
-hair-completion work they would have shown is implied across the cut into
-07_hero, same technique the reference reel itself uses.
+"""starbucks_recut.py — varied-rhythm assembly of all 7 shots.
 
-v2: the first cut of this recut used ONE fixed punch-in zoom centered on the
-FRAME for every wide shot, which does nothing to fix (and can worsen) subject
-drift when the three wide shots — 01_open, 03_crown, 07_hero — are each an
-independent Veo generation with no shared camera lock (see carvingSkill.MD
-Step 5/7). Measured their actual subject bounding boxes: 03_crown frames the
-melon largest (bbox height 1555px of 1920), 01_open next (1374px), 07_hero
-smallest (1315px). Since a crop can only zoom IN (magnify), not out, 03_crown
-— the largest — is the achievable common target; 01_open and 07_hero are each
-given their OWN zoom + SUBJECT-centered crop origin (not frame-centered) so
-their subject lands at the same size and frame-relative position 03_crown's
-does natively.
+v2: replaced a uniform frame-centered punch-in crop with per-clip SUBJECT-
+centered crops for the 3 wide shots (01_open/03_crown/07_hero), since each is
+an independent Veo generation with no shared camera lock and drifted in
+scale/position otherwise. See carvingSkill.MD Step 5/7.
+
+v3: added 04_face and 06_border back in (first+last-frame interpolation
+fixed both — see conversation), bringing the shot count to 7.
+
+v4: an independent cold review caught two defects v3 missed: (1) 02_star_macro
+was seeded from a since-corrected, over-carved ladder rung, so it showed the
+face/hair already finished, then shot 3 showed them flat again — a visible
+"carve runs backwards" regression; (2) stage_B_crown_star had the crown's
+background crescent INVERTED (cream where it should be dark green, matching
+the master), which poisoned every shot sourced from it (02, 03, 04). Fixed by
+rebuilding stage_B_crown_star and its dependent crops, then regenerating
+02/03/04. Also adds loudnorm — the review measured the source audio at
+-43.5 LUFS (near-silent, esp. the hero's last 4s at -71 LUFS) against a -14
+LUFS social target.
+
+v5: 05_hair_macro dropped entirely. Its seed (crop_hair_wave, cut from
+stage_D_hair) turned out to have captured the crown's zigzag bottom teeth
+plus a stray shadow wedge, not clean hair waves -- stage_D_hair was one of
+the over-carved/broken rungs identified in v4's cleanup and never rebuilt.
+A same-region crop from the CORRECTED stage_B_crown_star was tried as a
+replacement, but revealed stage_B's hair is ALSO already fully carved (a
+third instance of this rung over-delivering beyond "crown+star only", after
+the border and the crescent color) -- there is no verified-clean "hair
+partially carved" seed anywhere in this ladder. Rather than risk a third
+edit attempt at building one, the beat is dropped: 03_crown already shows
+hair fully carved (confirmed on the actual regenerated clip), so the jump
+from 01_open (0%) to 03_crown (~65%, hair included) already implies the
+hair got carved off-camera, consistent with how this reel already treats
+the face/border beats.
 """
 import subprocess, sys, os
 import numpy as np
@@ -34,9 +49,10 @@ os.makedirs(os.path.dirname(OUT), exist_ok=True)
 # expected when cutting wide->macro).
 PLAN = [
     ("veo_01_open",       0.3, 2.0, (954, 1696, 82, 179)),
-    ("veo_02_star_macro", 3.2, 1.2, None),
-    ("veo_03_crown",      1.8, 2.3, None),
-    ("veo_05_hair_macro", 3.5, 1.2, None),
+    ("veo_02_star_macro", 3.2, 1.3, None),
+    ("veo_03_crown",      1.8, 2.5, None),
+    ("veo_04_face",       1.8, 1.8, None),
+    ("veo_06_border",     3.3, 1.8, None),
     ("veo_07_hero",       2.8, 4.5, (914, 1624, 121, 260)),
 ]
 
@@ -55,9 +71,12 @@ for i, (_, _, _, crop_box) in enumerate(PLAN):
         crop = "scale=1080:1920"
     fc.append(f"[{i}:v]{crop},{GRADE},fps=30,setsar=1[v{i}]")
 streams = "".join(f"[v{i}][{i}:a]" for i in range(len(PLAN)))
-fc.append(f"{streams}concat=n={len(PLAN)}:v=1:a=1[v][a]")
+fc.append(f"{streams}concat=n={len(PLAN)}:v=1:a=1[vcat][acat]")
+# source audio measured at -43.5 LUFS (near-silent); normalize to a social
+# target instead of shipping near-silence with a stray loud transient.
+fc.append("[acat]loudnorm=I=-14:TP=-1.5:LRA=11[a]")
 
-args += ["-filter_complex", ";".join(fc), "-map", "[v]", "-map", "[a]",
+args += ["-filter_complex", ";".join(fc), "-map", "[vcat]", "-map", "[a]",
          "-c:v", "libx264", "-crf", "16", "-preset", "medium",
          "-pix_fmt", "yuv420p", "-c:a", "aac", "-b:a", "192k", OUT]
 r = subprocess.run(args, capture_output=True, text=True)
