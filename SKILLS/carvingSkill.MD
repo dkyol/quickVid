@@ -235,6 +235,25 @@ not the same amount, before cutting multiple crops or wide shots from it.
 
 ## Step 5 — generate video (Veo 3.1)
 
+**Correction (2026-08-01), reversing part of this Step's lead rule below:**
+"deepen an already-carved region" shots are safe from Veo's perspective
+(nothing for the model to get wrong) but often fail the actual viewer test —
+measured on a v2 Starbucks build, three such shots each cut a technically
+real dark-rind-to-pale-rind sliver, but every cut landed in a small gap
+between elements that were ALREADY fully carved on both sides, so the
+region read as 100% finished before and after the shot. The user's verdict:
+"the knife work does nothing." A cut is only visually convincing if it
+converts a LARGE, OBVIOUSLY-STILL-DARK area to pale — not just
+technically-correct pixels in a small gap. **Reserve pure deepening shots
+for texture/B-roll, not as headline beats** — for anything meant to read as
+"real carving happening," use a genuine small-to-moderate transition (an
+outline or partially-carved region becoming visibly more carved), pinned
+with a hand-built end-frame per the interpolation guidance below. On the
+same build, wide shots interpolating between adjacent ladder rungs (each a
+~15-25 percentage-point jump, e.g. stage_A→stage_B) worked reliably at full
+melon scale, not just as macros — "small bounded change" scopes by visible
+dark-area-converted, not by camera framing.
+
 **The single most reliable shot type: deepen an ALREADY-CARVED region, don't
 carve a flat one for the first time.** Compare a wolf carving reel's most
 delicate-looking moments (pulled the actual frames and job prompts to check)
@@ -283,6 +302,26 @@ So: **build a matching end-frame for any shot showing a small state change,
 and interpolate between them.** Reserve plain i2v for shots that aren't
 changing carve state at all (a hero turn-in-hand, a pure hold) — those have
 nothing to pin and don't need it.
+
+**This applies to refinement/deepening shots too, not just visible carve-state
+transitions — even when nothing about the carved AREA changes.** Measured on
+a v2 Starbucks build (2026-08-01): a plain i2v "deepen one already-carved
+hair wave" shot — the exact safe pattern this Step's lead rule recommends —
+came back with the cut showing dark green rind still visible UNDER the
+lifted curl, instead of the required pale inner rind. The carve-state was
+never in question (small, bounded, already-carved region, nothing
+transforming) — the physics of a single cut was still wrong, invisible at
+thumbnail-scrub scale, only caught by a full-resolution frame pull and a
+user's own eye. Switching to the same hand-built-end-frame + `last_frame`
+technique (end frame = an edit of the seed showing that one stroke ALREADY
+made, with the correct pale-under-cut color) fixed it on the first retake.
+So: for ANY shot where a specific visual detail must come out correct — not
+just "does the carve-state end up right" — pin it with an end-frame rather
+than trusting Veo's own judgement of cut physics, material color, or
+anything else load-bearing to realism. The "nothing to pin" carve-out above
+is narrower than it first reads: it's for shots with no state to get wrong
+at all (a pure hold, a turn), not merely for shots where the carve
+percentage happens not to change.
 
 **DEFAULT for transition/reveal beats: a stills+crossfade sequence, not Veo
 at all — reserve Veo entirely for shots where real tool motion is the

@@ -1,0 +1,50 @@
+{
+  "project": "starbucks_watermelon_v2",
+  "aspect_ratio": "9:16",
+  "resolution": "1080p",
+  "_thesis": "Replaces the knife-less stills+crossfade progression with real Veo footage per user feedback (2026-08-01): the stills sequence read as the melon carving itself with no visible mechanism. Each shot interpolates between two ALREADY-VERIFIED, already-QC'd ladder rungs (stage_A..stage_F), reusing existing assets -- no new seed generation needed. Each step is a bounded, moderate change (~15-25 carved-percentage points), matching the size of change the flower_transition shot proved reliable at, not the large single outline-to-finished jump Step 5 warns against. 01_ab runs alone first as a canary (wide framing is new territory -- the only prior success at this technique was on a tight macro) before committing the rest.",
+  "style_suffix": "Shallow bas-relief carved INTO the curved watermelon rind, traditional Thai fruit carving of a Starbucks-style siren medallion with a flower-and-vine border. The carving never moves, blinks or breathes on its own -- only the knife, the hand and falling shavings move. At most ONE knife in ONE hand anywhere, never two. Only watermelon colors anywhere: dark green rind, pale green-white inner rind, cream pith; no red flesh anywhere, no grey, no black, no brown. A cut through the dark green rind ALWAYS reveals the solid pale green-white inner rind underneath, never another dark green layer, not even a thin dark line. The dark green rind areas show natural mottled marbling, subtle lighter jade streaks, like real watermelon skin. Soft flat diffused daylight, plain light grey-white background, matte natural texture, photorealistic, shallow focus. No hands, no arms except the one carving hand.",
+  "negative_prompt": "two knives, second knife, duplicate blade, extra hand, mirrored hands, large area removed at once, whole sheet of rind peeling, redesigned pattern, different logo, different face, entire design carved at once, entire remaining design finished instantly, wrong location, pre-finished carving, static unchanging shot, unrelated close-up, scene change mid-clip, cartoon, illustration, painting, airbrush, glowing, neon, red flesh, red juice, moving face, blinking, living person, text, watermark, subtitles, music, letterbox, black bars, green rind visible under a cut, double green layer, stand, pedestal, prop change",
+  "shots": [
+    {
+      "name": "prog_ab",
+      "scale": "wide",
+      "seed": "stage_A_outline",
+      "seed_end": "stage_B_crown_star",
+      "takes": 1,
+      "prompt": "Wide shot of the whole watermelon resting on the surface. The whole design -- crown, star, siren's face and hair, medallion ring, flower-and-vine border -- is drawn only as thin dark outline strokes on smooth intact rind, nothing carved yet. A hand holding a small carving knife enters and carves ONLY the crown and the star into shallow pale relief with a series of clean strokes, curls of rind lifting and falling away as it works, revealing solid pale green-white rind beneath every cut. Nothing else in the design changes -- the face, hair, medallion ring and border remain flat outline the whole time. The knife then lifts away."
+    },
+    {
+      "name": "prog_bc",
+      "scale": "wide",
+      "seed": "stage_B_crown_star",
+      "seed_end": "stage_C_face",
+      "takes": 1,
+      "prompt": "Wide shot of the whole watermelon resting on the surface. The crown and star are already carved into pale relief; everything else is still flat outline on intact rind. A hand holding a small carving knife enters and carves ONLY the siren's face -- forehead, eyes, nose, smiling mouth -- into shallow pale relief with a series of clean strokes, curls of rind lifting and falling away, revealing solid pale green-white rind beneath every cut. The hair, medallion ring and border remain flat outline the whole time. The knife then lifts away."
+    },
+    {
+      "name": "prog_cd",
+      "scale": "wide",
+      "seed": "stage_C_face",
+      "seed_end": "stage_D_hair",
+      "takes": 1,
+      "prompt": "Wide shot of the whole watermelon resting on the surface. The crown, star and face are already carved into pale relief; the hair, medallion ring and border are still flat outline. A hand holding a small carving knife enters and carves ONLY the siren's wavy hair strands into shallow pale relief with a series of clean strokes, curls of rind lifting and falling away, revealing solid pale green-white rind beneath every cut. The medallion ring and border remain flat outline the whole time. The knife then lifts away."
+    },
+    {
+      "name": "prog_de",
+      "scale": "wide",
+      "seed": "stage_D_hair",
+      "seed_end": "stage_E_no_border",
+      "takes": 1,
+      "prompt": "Wide shot of the whole watermelon resting on the surface. The crown, star, face and hair are already carved into pale relief; the medallion ring line and the outer flower-and-vine border are still flat outline. A hand holding a small carving knife enters and carves ONLY the medallion ring into a clean shallow groove circling the design, curls of rind lifting and falling away, revealing solid pale green-white rind beneath the cut. The outer border remains flat outline the whole time. The knife then lifts away."
+    },
+    {
+      "name": "prog_ef",
+      "scale": "wide",
+      "seed": "stage_E_no_border",
+      "seed_end": "stage_F_border_vines",
+      "takes": 1,
+      "prompt": "Wide shot of the whole watermelon resting on the surface. The medallion -- crown, star, face, hair, ring -- is already fully carved into pale relief; the outer flower-and-vine border is still flat outline, the four flowers and the vines both undrawn as relief. A hand holding a small carving knife enters and carves ONLY the vine tendrils and leaf shapes of the border into shallow pale relief with a series of clean strokes, curls of rind lifting and falling away, revealing solid pale green-white rind beneath every cut. The four flower rosettes remain completely flat outline the whole time, untouched. The knife then lifts away."
+    }
+  ]
+}

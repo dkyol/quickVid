@@ -1,0 +1,47 @@
+{
+  "project": "starbucks_watermelon_v2",
+  "aspect_ratio": "9:16",
+  "resolution": "1080p",
+  "_thesis": "v2 build. Master is hands-free (resting on a surface, matching Final_look.jpg / the agent_generate reference) with a richer flower-and-vine border (4 rosettes) and natural mottled rind, vs v1's held-in-hands master with a plain leaf ring. Per carvingSkill.MD Step 5: most shots are DEEPENING refinements on already-carved macro crops (safest pattern -- no state for Veo to get wrong), not flat-to-carved transitions. Only ONE shot (04_flower) is a real transition, done as last_frame interpolation with a hand-built end-frame so nothing is left for Veo to improvise. 01_face runs alone first as a canary (face-forward subjects carry a strong wrong-place/living-animation bias per the v1 Starbucks lesson, even though this is a refinement not a transition). 05_hero is hands-free/no-knife, matching the reference stills' calm presentation look.",
+  "style_suffix": "Shallow bas-relief carved INTO the curved watermelon rind, traditional Thai fruit carving of a Starbucks-style siren medallion with a flower-and-vine border. The carving never moves, blinks or breathes on its own -- only the knife, the hand and falling shavings move, except in shots with no knife/hand at all, where nothing moves except ambient light. At most ONE knife in ONE hand anywhere, never two. Only watermelon colors anywhere: dark green rind, pale green-white inner rind, cream pith; no red flesh anywhere, no grey, no black, no brown. A cut through the dark green rind ALWAYS reveals the solid pale green-white inner rind underneath, never another dark green layer. The dark green rind areas show natural mottled marbling, subtle lighter jade streaks, like real watermelon skin. Soft flat diffused daylight, plain light grey-white background, matte natural texture, photorealistic, shallow focus.",
+  "negative_prompt": "two knives, second knife, duplicate blade, extra hand, mirrored hands, large area removed at once, whole sheet of rind peeling, redesigned pattern, different logo, different face, entire face carved at once, entire flower carved instantly, entire design carved at once, wrong location, pre-finished carving, static unchanging shot, unrelated close-up, scene change mid-clip, cartoon, illustration, painting, airbrush, glowing, neon, red flesh, red juice, moving face, blinking, living person, text, watermark, subtitles, music, letterbox, black bars, green rind visible under a cut, double green layer, stand, pedestal, prop change",
+  "shots": [
+    {
+      "name": "01_face_deepen",
+      "scale": "macro",
+      "seed": "crop_face",
+      "takes": 1,
+      "prompt": "Extreme macro close-up on the siren's already-carved face and flowing hair -- finished shallow pale relief with crisp dark green linework, exactly as carved, nothing flat or unfinished anywhere in frame. A hand holding a small carving knife enters from the bottom of frame and makes ONE short clean stroke retracing the smile line, deepening it very slightly -- a tiny sliver of pale rind curls away and falls. Nothing else changes: the eyes, eyebrows, nose, cheeks and every hair strand stay exactly as carved, not redrawn, not redesigned. The face never moves, blinks or changes expression the entire time. The knife then lifts away."
+    },
+    {
+      "name": "02_crown_deepen",
+      "scale": "macro",
+      "seed": "crop_crown_star",
+      "takes": 1,
+      "prompt": "Extreme macro close-up on the already-carved crown and star -- finished shallow pale relief with crisp dark green linework, exactly as carved, nothing flat anywhere in frame. A hand holding a small carving knife enters from the bottom of frame and makes TWO short clean strokes retracing one crown point's edge, deepening it slightly -- a thin curl of pale rind lifts and falls away. Nothing else changes: the rest of the crown, the star, and the surrounding carved leaf shapes stay exactly as carved, not redrawn. The knife then lifts away."
+    },
+    {
+      "name": "03_hair_deepen",
+      "scale": "macro",
+      "seed": "crop_hair_wave",
+      "seed_end": "hair_wave_deepened",
+      "takes": 1,
+      "prompt": "Extreme macro close-up on the siren's already-carved flowing hair strands -- finished shallow pale relief with crisp dark green linework separating each wave, exactly as carved, nothing flat anywhere in frame. A hand holding a small carving knife enters from the side of frame and makes TWO short clean strokes retracing one wave's groove, deepening it slightly -- a thin curl of rind lifts and falls away. The freshly cut surface under the curl, and the curl's own inner surface, are solid pale green-white -- NEVER dark green underneath. Nothing else changes: every other wave stays exactly as carved, not redrawn. The knife then lifts away."
+    },
+    {
+      "name": "04_flower_transition",
+      "scale": "macro",
+      "seed": "crop_flower_tl_outline",
+      "seed_end": "flower_tl_carved",
+      "takes": 1,
+      "prompt": "Extreme macro close-up: one flower rosette is drawn ONLY as a faint thin dark outline on smooth, intact, completely unmarked dark green rind -- totally uncarved, no relief anywhere on the flower yet. A hand holding a small carving knife enters from the bottom of frame and makes several short clean strokes along the flower's petal outlines, lifting thin curls of dark green rind that fall away, carving the flower into shallow pale relief with a distinct carved center -- ending exactly matching the finished design. Nothing else in frame changes: the vine, the leaf, and the surrounding mottled rind stay completely smooth, untouched, unmarked, not redrawn. The knife then lifts away."
+    },
+    {
+      "name": "05_hero_hold",
+      "scale": "wide",
+      "seed": "master",
+      "takes": 1,
+      "prompt": "Wide shot of the whole finished carved watermelon resting on the surface, exactly as carved -- crown, star, siren's face, hair, medallion ring and the full flower-and-vine border all finished shallow pale relief, nothing flat or unfinished anywhere. No hands, no arms, no knife, no tool anywhere in frame. The carving holds completely still -- only the soft daylight shifts very faintly across the surface. Nothing changes shape, nothing is added or removed, no camera movement."
+    }
+  ]
+}
