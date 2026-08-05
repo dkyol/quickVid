@@ -1,0 +1,20 @@
+{
+  "1":  { "par": 5, "yards": 465, "handicap": 10, "map": "media/hole_maps/01_map.png" },
+  "2":  { "par": 4, "yards": 376, "handicap": 9,  "map": "media/hole_maps/02_map.png" },
+  "3":  { "par": 5, "yards": 492, "handicap": 1,  "map": "media/hole_maps/03_map.png" },
+  "4":  { "par": 3, "yards": 157, "handicap": 16, "map": "media/hole_maps/04_map.png" },
+  "5":  { "par": 4, "yards": 350, "handicap": 17, "map": "media/hole_maps/05_map.png" },
+  "6":  { "par": 4, "yards": 358, "handicap": 12, "map": "media/hole_maps/06_map.png" },
+  "7":  { "par": 4, "yards": 328, "handicap": 18, "map": "media/hole_maps/07_map.png" },
+  "8":  { "par": 3, "yards": 194, "handicap": 8,  "map": "media/hole_maps/08_map.png" },
+  "9":  { "par": 4, "yards": 388, "handicap": 5,  "map": "media/hole_maps/09_map.png" },
+  "10": { "par": 5, "yards": 438, "handicap": 6,  "map": null },
+  "11": { "par": 4, "yards": 383, "handicap": 14, "map": null },
+  "12": { "par": 4, "yards": 412, "handicap": 3,  "map": null },
+  "13": { "par": 3, "yards": 152, "handicap": 11, "map": null },
+  "14": { "par": 4, "yards": 305, "handicap": 15, "map": null },
+  "15": { "par": 3, "yards": 170, "handicap": 7,  "map": null },
+  "16": { "par": 5, "yards": 508, "handicap": 2,  "map": null },
+  "17": { "par": 4, "yards": 340, "handicap": 13, "map": null },
+  "18": { "par": 4, "yards": 345, "handicap": 4,  "map": null }
+}
