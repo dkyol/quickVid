@@ -1,0 +1,8 @@
+{
+  "path": "work/dancingMuppet/exp0.mp4",
+  "fps": 24.0,
+  "n_frames": 121,
+  "mean_abs_frame_diff": 4.1795,
+  "max_abs_frame_diff": 16.1423,
+  "dominant_motion_period_s": 0.5417
+}

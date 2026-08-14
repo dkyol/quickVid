@@ -393,6 +393,7 @@ def main():
     os.makedirs(media_dir, exist_ok=True)
 
     style = job.get("style_suffix", "")
+    style_guard = "" if job.get("no_style_guard") else DEFAULT_STYLE_GUARD
     negative = job.get("negative_prompt")
     aspect = job.get("aspect_ratio", "9:16")
     resolution = job.get("resolution", "1080p")
@@ -432,7 +433,8 @@ def main():
         if args.shot and args.shot != name:
             continue
         dst = os.path.join(media_dir, f"veo_{name}.mp4")
-        prompt = f"{shot['prompt']} {style} {DEFAULT_STYLE_GUARD}".strip()
+        prompt = f"{shot['prompt']} {style} {style_guard}".strip()
+        shot_negative = shot.get("negative_prompt", negative)
         seed = resolve_seed_path(shot["seed"], proj_dir)
         seed_end = (resolve_seed_path(shot["seed_end"], proj_dir)
                     if shot.get("seed_end") else None)
@@ -466,7 +468,7 @@ def main():
                     for k in range(1, want + 1)])
         got = 0
         for target in targets:
-            if args.takes > 1 and os.path.isfile(target) and not args.force:
+            if want > 1 and os.path.isfile(target) and not args.force:
                 print(f"  [skip] {os.path.basename(target)} exists")
                 got += 1
                 continue
@@ -474,7 +476,7 @@ def main():
                            model=args.model, aspect=aspect,
                            resolution=resolution,
                            duration=int(shot.get("duration", duration)),
-                           negative=negative)
+                           negative=shot_negative)
             if out:
                 print(f"  -> {os.path.basename(target)}")
                 got += 1

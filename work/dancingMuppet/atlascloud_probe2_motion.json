@@ -1,0 +1,8 @@
+{
+  "path": "work/dancingMuppet/atlascloud_probe2.mp4",
+  "fps": 24.0,
+  "n_frames": 121,
+  "mean_abs_frame_diff": 11.5279,
+  "max_abs_frame_diff": 26.404,
+  "dominant_motion_period_s": 1.7083
+}

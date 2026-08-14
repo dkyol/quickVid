@@ -1,0 +1,8 @@
+{
+  "path": "work/dancingMuppet/full30.mp4",
+  "fps": 24.0,
+  "n_frames": 721,
+  "mean_abs_frame_diff": 6.2734,
+  "max_abs_frame_diff": 19.6765,
+  "dominant_motion_period_s": 0.2917
+}

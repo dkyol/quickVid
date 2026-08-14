@@ -1,0 +1,39 @@
+{
+  "project": "flyover_langston_10_vantage",
+  "aspect_ratio": "9:16",
+  "resolution": "1080p",
+  "duration": 8,
+  "no_style_guard": true,
+  "_note": "Hole 10, Langston Golf Course (DC), par 5 ~483yd. All four seeds are REAL ground-level photos supplied by the user (tee to green), not synthesized. Each shot below interpolates between two consecutive real photos -- constrained start+end frame interpolation, not open-ended extrapolation from a single anchor. This is the untested-but-favorable case golfFlyoverVantage.MD's open items flagged: a real photo at every waypoint instead of just the tee.",
+  "style_suffix": "Golfer's-eye view, camera at grass-top / eye level the whole time, never rising into an aerial or drone-height shot. Natural bright, slightly hazy midday daylight matching the source photos exactly -- not golden hour, not relit. Real grass texture, long fairway grass patterns, real cloud cover. Camera stays oriented straight down the fairway line the whole time, matching the framing of the source photos exactly. No text, no watermark.",
+  "negative_prompt": "static shot, hovering, frozen camera, no movement, stationary camera, tripod shot, slow crawl, golden hour, warm sunset light, sun flare, lens flare, aerial view, drone establishing shot, satellite view, top-down view, birds-eye view, high altitude, invented bunker, invented water hazard, extra flag, extra green, mirror flip, text, watermark",
+  "shots": [
+    {
+      "name": "01_tee_to_fairway",
+      "seed": "A_tee",
+      "seed_end": "B_fairway",
+      "prompt": "Continuous smooth forward glide off the golf tee, grass-top height. The tee marker passes just out of frame on the right early in the shot. As the fairway grass leads down toward the pond, the camera banks gently out and low over the near edge of the water -- for a couple of seconds the reflective pond surface fills the lower part of the frame, close enough to see ripples and the far bank's reeds and trees reflected in it -- before curving back in to rejoin the fairway line and land on the grass at the end of the shot. This is a real pond visible in both the start and end frames, not an invented hazard. There is NO putting green and NO flag anywhere in this shot -- this is still the fairway, far from the green, only grass, water, reeds and trees are visible the entire time. Camera never stops moving, no banking so hard it feels like a whip pan, just a smooth low arc out over the water and back.",
+      "negative_prompt": "static shot, hovering, frozen camera, no movement, stationary camera, tripod shot, slow crawl, golden hour, warm sunset light, sun flare, lens flare, aerial view, drone establishing shot, satellite view, top-down view, birds-eye view, high altitude, mirror flip, text, watermark, second pond, additional water hazard not connected to the visible pond, putting green, golf green, flagstick, flag, hole cup, pin, golf hole"
+    },
+    {
+      "name": "02_fairway_to_approach",
+      "seed": "B_fairway",
+      "seed_end": "C_approach",
+      "prompt": "Continuous smooth forward glide at the same grass-top height, tracking further up the fairway as the ground rises gently toward the green in the distance, tree line on both sides. The red flag on the raised green comes into view near the horizon as the camera advances. No cuts, no hovering, camera never stops moving."
+    },
+    {
+      "name": "03a_approach_to_mid",
+      "seed": "C_approach",
+      "seed_end": "C2_midapproach",
+      "prompt": "Continuous smooth forward glide, still at grass-top height, cresting the rise as the green complex comes into clearer view: the putting surface and a bunker start to be visible. The small distant flag grows larger and its color settles from red to yellow as the camera gets close enough to see it clearly. Camera stays low and level, tracks straight forward, no sideways pan. No cuts, no hovering, camera never stops moving.",
+      "negative_prompt": "static shot, hovering, frozen camera, no movement, stationary camera, tripod shot, slow crawl, golden hour, warm sunset light, sun flare, lens flare, aerial view, drone establishing shot, satellite view, top-down view, birds-eye view, high altitude, invented bunker, invented water hazard, mirror flip, text, watermark, second flag, duplicate flagstick, second green, two greens, flag teleporting, flag jumping to a new position, two flags visible at once, hard sideways pan, whip pan, camera swinging sideways"
+    },
+    {
+      "name": "03b_mid_to_green",
+      "seed": "C2_midapproach",
+      "seed_end": "D_green",
+      "prompt": "Continuous smooth forward glide, still at grass-top height, closing the final distance into the green complex: the putting surface, flanking bunkers, and parked golf cart come fully into view. The yellow flag stays yellow and grows steadily larger and closer, no color change needed. Camera stays low and level the entire time -- it does not climb into an aerial reveal. No cuts, no hovering, camera never stops moving.",
+      "negative_prompt": "static shot, hovering, frozen camera, no movement, stationary camera, tripod shot, slow crawl, golden hour, warm sunset light, sun flare, lens flare, aerial view, drone establishing shot, satellite view, top-down view, birds-eye view, high altitude, invented bunker, invented water hazard, mirror flip, text, watermark, second flag, duplicate flagstick, second green, two greens, flag teleporting, flag jumping to a new position, two flags visible at once, hard sideways pan, whip pan, camera swinging sideways"
+    }
+  ]
+}

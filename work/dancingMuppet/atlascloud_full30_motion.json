@@ -1,0 +1,8 @@
+{
+  "path": "work/dancingMuppet/atlascloud_full30.mp4",
+  "fps": 23.999,
+  "n_frames": 721,
+  "mean_abs_frame_diff": 8.9573,
+  "max_abs_frame_diff": 33.4136,
+  "dominant_motion_period_s": 0.5417
+}
