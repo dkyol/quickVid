@@ -1,0 +1,50 @@
+{
+  "project": "dc_run_stitch",
+  "model": "veo-3.1-lite-generate-preview",
+  "aspect_ratio": "9:16",
+  "resolution": "1080p",
+  "duration": 8,
+  "transition": {
+    "whip_seconds": 0.4,
+    "speed": 2.5,
+    "xfade_seconds": 0.08,
+    "blur_sigma": 14
+  },
+  "images": [
+    {
+      "name": "02_2214",
+      "seed": "02_2214.jpg",
+      "prompt": "Continue this exact scene naturally, camera moving forward along the riverside boardwalk path at a steady running pace toward the bridge in the distance, under the same cloudy sky. Do not introduce any new people, animals, boats, or structures that are not already visible in the frame. Do not change the weather, lighting, or season. If the path curves or the view is blocked, follow it naturally rather than cutting through or revealing what's beyond it. No text, captions, or watermarks.",
+      "cut_at": 2.75,
+      "speed": 1.304
+    },
+    {
+      "name": "03_2223",
+      "seed": "03_2223.png",
+      "prompt": "Continue this exact scene naturally: a runner's point-of-view running forward through a tree canopy with branches and sky visible, camera moving steadily forward at running pace as leaves and branches pass by. Do not introduce any new people, animals, structures, or objects that are not already visible in the frame. Do not change the weather, lighting, or season. No text, captions, or watermarks.",
+      "cut_at": 2.29,
+      "speed": 0.825
+    },
+    {
+      "name": "04_2227",
+      "seed": "04_2227.jpg",
+      "prompt": "Continue this exact scene naturally, camera moving forward along the paved trail at a steady running pace, chain-link fence and overgrown grass passing on the right, utility poles and wires overhead. Do not introduce any new people, vehicles, animals, or structures that are not already visible in the frame. Do not change the weather, lighting, or season. If the path curves or the view is blocked, follow it naturally rather than cutting through or revealing what's beyond it. No text, captions, or watermarks.",
+      "cut_at": 2.26,
+      "speed": 0.809
+    },
+    {
+      "name": "05_2233",
+      "seed": "05_2233.jpg",
+      "prompt": "Continue this exact scene naturally, camera moving forward along the trail as it curves toward the waterfront, with the river and distant skyline staying visible on the right. Do not introduce any new people, boats, animals, or structures that are not already visible in the frame. Do not change the weather, lighting, or season. If the path curves or the view is blocked, follow it naturally rather than cutting through or revealing what's beyond it. No text, captions, or watermarks.",
+      "cut_at": 2.90,
+      "speed": 1.166
+    },
+    {
+      "name": "06_2236",
+      "seed": "06_2236.jpg",
+      "prompt": "Continue this exact scene naturally, camera moving forward along the brick sidewalk past the corner, the brick apartment building staying on the right and the street on the left. Do not introduce any new people, vehicles, animals, or structures that are not already visible in the frame. Do not change the weather, lighting, or season. No text, captions, or watermarks.",
+      "cut_at": 2.2,
+      "speed": 1.0
+    }
+  ]
+}
